@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, "Times New Roman", serif;
+  --color-morocco: #c1272d;
+  --color-morocco-deep: #7f1016;
+  --color-morocco-green: #006233;
+  --color-ivory: #f8f3e6;
+  --color-gold: #d3a24b;
+  --color-gold-deep: #97742e;
+  --color-terra: #b45f3c;
+  --color-ink: #3f2a12;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f8f3e6;
+  overflow-x: hidden;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(193, 39, 45, 0.85);
+  color: #fff;
+}
+
+@keyframes bg-zoom {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-bg-zoom {
+  animation: bg-zoom 32s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.animate-fade-in {
+  animation: fade-in 1.6s ease-out both;
+}
+
+.animate-fade-up {
+  animation: fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise {
+  animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-anim {
+  animation: page-fade 0.6s ease-out both;
+}
+
+@media (min-width: 1024px) and (min-height: 680px) {
+  .page-fit {
+    height: 100dvh;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .page-fit .page-fit-inner {
+    flex: none;
+    height: min(860px, calc(100dvh - 24px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bg-zoom,
+  .animate-fade-in,
+  .animate-fade-up,
+  .animate-rise,
+  .page-anim {
+    animation: none;
+  }
+}

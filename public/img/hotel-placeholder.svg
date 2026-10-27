@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#faf4e4"/>
+      <stop offset="1" stop-color="#f0e4c8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect x="22" y="22" width="756" height="456" fill="none" stroke="#d3a24b" stroke-opacity="0.5" stroke-width="2"/>
+  <path d="M310 388 L310 236 Q310 148 400 148 Q490 148 490 236 L490 388 Z" fill="#f7efdd" stroke="#d3a24b" stroke-opacity="0.75" stroke-width="2.5"/>
+  <path d="M330 388 L330 244 Q330 168 400 168 Q470 168 470 244 L470 388 Z" fill="none" stroke="#d3a24b" stroke-opacity="0.4" stroke-width="1.5"/>
+  <path d="M400 218 L407 239 L429 239 L411 252 L418 273 L400 260 L382 273 L389 252 L371 239 L393 239 Z" fill="#c9a24b" fill-opacity="0.85"/>
+  <g fill="#c9a24b" fill-opacity="0.7">
+    <path d="M370 424 L377 431 L370 438 L363 431 Z"/>
+    <path d="M400 424 L407 431 L400 438 L393 431 Z"/>
+    <path d="M430 424 L437 431 L430 438 L423 431 Z"/>
+  </g>
+  <circle cx="118" cy="70" r="5" fill="#c9a24b" fill-opacity="0.55"/>
+  <circle cx="682" cy="430" r="5" fill="#c9a24b" fill-opacity="0.55"/>
+</svg>
