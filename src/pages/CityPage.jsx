@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, BedDouble, Compass, Utensils } from "lucide-react";
+import { Navigate, useParams } from "react-router-dom";
+import { BedDouble, Compass, Utensils } from "lucide-react";
 import SiteFooter from "../components/SiteFooter";
+import SiteNav from "../components/SiteNav";
 import ZelligeEdges from "../components/ZelligeEdges";
 import CityHero from "../components/city/CityHero";
 import HotelsSection from "../components/hotels/HotelsSection";
@@ -32,7 +33,6 @@ const CATEGORIES = [
 
 export default function CityPage() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const [category, setCategory] = useState("hotels");
   const city = cities.find((c) => c.slug === slug);
 
@@ -44,36 +44,21 @@ export default function CityPage() {
   const active = CATEGORIES.find((c) => c.id === category);
 
   return (
-    <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
+    <div className="page-anim relative flex min-h-dvh flex-col overflow-x-hidden bg-ivory font-sans text-ink antialiased">
       <ZelligeEdges />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-6 pt-4 sm:px-6 lg:px-10">
-        <header className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center">
-          <button
-            type="button"
-            onClick={() => navigate("/cities")}
-            className="group inline-flex items-center gap-2 justify-self-start rounded-full border border-gold/35 bg-white/60 px-4 py-2 text-xs font-semibold text-ink/70 transition-all duration-300 hover:-translate-x-0.5 hover:border-gold/70 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep sm:px-5 sm:text-sm"
-          >
-            <ArrowLeft
-              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5"
-              aria-hidden="true"
-            />
-            Back to Cities
-          </button>
-          <Link
-            to="/"
-            aria-label="Bladna — back to home"
-            className="justify-self-center rounded-full font-display text-sm font-semibold uppercase tracking-[0.34em] text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep sm:text-base"
-          >
-            Bladna
-          </Link>
-          <div />
-        </header>
+      <SiteNav
+        backTo="/cities"
+        backLabel="Back to Cities"
+        category={category}
+        onCategoryChange={setCategory}
+      />
 
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-10">
         <CityHero guide={guide} city={city} />
 
         <nav
-          aria-label="Categories"
+          aria-label="Place categories"
           className="mt-6 flex shrink-0 justify-center"
         >
           <div className="inline-flex items-center gap-1 rounded-full border border-gold/35 bg-white/60 p-1.5 shadow-[0_14px_34px_-18px_rgba(63,42,18,0.4)] backdrop-blur-md sm:gap-1.5">
@@ -108,9 +93,9 @@ export default function CityPage() {
             <PlacesSection city={city} kind={category === "restaurants" ? "restaurant" : "activity"} />
           )}
         </section>
-
-        <SiteFooter />
       </div>
+
+      <SiteFooter />
     </div>
   );
 }

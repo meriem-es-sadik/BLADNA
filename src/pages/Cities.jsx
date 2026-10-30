@@ -1,6 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import SiteFooter from "../components/SiteFooter";
+import SiteNav from "../components/SiteNav";
 import { cities } from "../data/cities";
 
 const CITY_STORAGE_KEY = "bladna-selected-city";
@@ -17,7 +18,7 @@ export default function Cities() {
   };
 
   return (
-    <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
+    <div className="page-anim relative flex min-h-dvh flex-col overflow-x-hidden bg-ivory font-sans text-ink antialiased">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 select-none">
         <img
           src="/img/zliij.png"
@@ -51,19 +52,11 @@ export default function Cities() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-6 pt-4 sm:px-6 lg:px-10">
-        <header className="flex shrink-0 justify-center">
-          <Link
-            to="/"
-            aria-label="Bladna — back to home"
-            className="rounded-full font-display text-sm font-semibold uppercase tracking-[0.34em] text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep sm:text-base"
-          >
-            Bladna
-          </Link>
-        </header>
+      <SiteNav />
 
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-10">
         <section className="flex shrink-0 flex-col items-center text-center">
-          <h1 className="mt-3 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
+          <h1 className="mt-2 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
             Where Would You <span className="italic text-terra">Like to Go?</span>
           </h1>
           <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-ink/70 sm:text-[15px]">
@@ -93,9 +86,9 @@ export default function Cities() {
             ))}
           </ul>
         </section>
-
-        <SiteFooter />
       </div>
+
+      <SiteFooter />
     </div>
   );
 }
