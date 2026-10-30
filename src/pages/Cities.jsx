@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import SiteFooter from "../components/SiteFooter";
 import { cities } from "../data/cities";
 
 const CITY_STORAGE_KEY = "bladna-selected-city";
@@ -92,6 +93,8 @@ export default function Cities() {
             ))}
           </ul>
         </section>
+
+        <SiteFooter />
       </div>
     </div>
   );

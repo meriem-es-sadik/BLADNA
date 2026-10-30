@@ -73,6 +73,15 @@ body {
   }
 }
 
+@keyframes city-hero-pan {
+  from {
+    transform: scale(1.01) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.07) translate3d(0, -0.6%, 0);
+  }
+}
+
 @keyframes page-fade {
   from {
     opacity: 0;
@@ -99,6 +108,11 @@ body {
   animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.city-hero-image {
+  animation: city-hero-pan 8s ease-out both;
+  will-change: transform, opacity;
+}
+
 .page-anim {
   animation: page-fade 0.6s ease-out both;
 }
@@ -121,6 +135,7 @@ body {
   .animate-fade-in,
   .animate-fade-up,
   .animate-rise,
+  .city-hero-image,
   .page-anim {
     animation: none;
   }

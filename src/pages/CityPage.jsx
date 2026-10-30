@@ -1,28 +1,32 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, BedDouble, Compass, Utensils } from "lucide-react";
+import SiteFooter from "../components/SiteFooter";
 import ZelligeEdges from "../components/ZelligeEdges";
+import CityHero from "../components/city/CityHero";
 import HotelsSection from "../components/hotels/HotelsSection";
+import PlacesSection from "../components/places/PlacesSection";
 import { cities } from "../data/cities";
+import { getCityGuide } from "../data/cityGuides";
 
 const CATEGORIES = [
   {
     id: "hotels",
     label: "Hotels",
     icon: BedDouble,
-    blurb: "A curated collection of stays will appear here soon.",
+    blurb: "Real, community-mapped stays across Morocco.",
   },
   {
     id: "restaurants",
     label: "Restaurants",
     icon: Utensils,
-    blurb: "Fine Moroccan dining will appear here soon.",
+    blurb: "Real, community-mapped places to eat across the city.",
   },
   {
     id: "activities",
     label: "Activities",
     icon: Compass,
-    blurb: "Unforgettable experiences will appear here soon.",
+    blurb: "Museums, monuments, parks and experiences worth your time.",
   },
 ];
 
@@ -36,8 +40,8 @@ export default function CityPage() {
     return <Navigate to="/cities" replace />;
   }
 
+  const guide = getCityGuide(city.slug);
   const active = CATEGORIES.find((c) => c.id === category);
-  const ActiveIcon = active.icon;
 
   return (
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
@@ -66,14 +70,7 @@ export default function CityPage() {
           <div />
         </header>
 
-        <section className="flex shrink-0 flex-col items-center text-center">
-          <h1 className="mt-4 font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
-            Discover <span className="italic text-terra">{city.name}</span>
-          </h1>
-          <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-ink/70 sm:text-[15px]">
-            Explore the best places and experiences in your destination.
-          </p>
-        </section>
+        <CityHero guide={guide} city={city} />
 
         <nav
           aria-label="Categories"
@@ -104,24 +101,15 @@ export default function CityPage() {
           </div>
         </nav>
 
-        <section
-          key={active.id}
-          className="animate-fade-in flex flex-1 items-center justify-center"
-        >
+        <section key={active.id} className="animate-fade-in mt-7 flex flex-1 flex-col">
           {category === "hotels" ? (
             <HotelsSection city={city} />
           ) : (
-            <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-10 text-center shadow-[0_18px_40px_-24px_rgba(63,42,18,0.4)] backdrop-blur-sm sm:py-12">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#c9a24b]/15 text-gold-deep">
-                <ActiveIcon className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <h2 className="font-display text-2xl font-medium text-ink sm:text-[1.75rem]">
-                {active.label} in <span className="italic text-terra">{city.name}</span>
-              </h2>
-              <p className="mt-2 text-sm text-ink/60">{active.blurb}</p>
-            </div>
+            <PlacesSection city={city} kind={category === "restaurants" ? "restaurant" : "activity"} />
           )}
         </section>
+
+        <SiteFooter />
       </div>
     </div>
   );

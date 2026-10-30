@@ -88,7 +88,7 @@ export default function HotelFilters({
           onChange={(e) => onSort(e.target.value)}
           className="rounded-full border border-gold/35 bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-ink focus:border-gold/80 focus:outline-none focus:ring-2 focus:ring-[#c9a24b]/30"
         >
-          <option value="rating">Customer rating</option>
+          <option value="rating">Recommended</option>
           <option value="stars">Stars high → low</option>
           <option value="az">Name A → Z</option>
           <option value="za">Name Z → A</option>
