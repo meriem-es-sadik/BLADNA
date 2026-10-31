@@ -18,7 +18,7 @@ export default function Cities() {
   };
 
   return (
-    <div className="page-anim relative flex min-h-dvh flex-col overflow-x-hidden bg-ivory font-sans text-ink antialiased">
+    <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 select-none">
         <img
           src="/img/zliij.png"
@@ -64,15 +64,15 @@ export default function Cities() {
           </p>
         </section>
 
-        <section aria-label="Moroccan cities" className="flex flex-1 items-center justify-center">
-          <ul className="grid w-full grid-cols-1 gap-4 py-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section aria-label="Moroccan cities" className="flex min-h-0 flex-1 flex-col">
+          <ul className="grid w-full flex-1 auto-rows-fr grid-cols-1 gap-4 py-6 sm:grid-cols-2 lg:grid-cols-3">
             {cities.map((city) => (
-              <li key={city.slug}>
+              <li key={city.slug} className="min-h-[72px]">
                 <button
                   type="button"
                   onClick={() => selectCity(city)}
                   aria-label={"Select " + city.name + " as your destination"}
-                  className="group flex h-[72px] w-full items-center justify-between rounded-[1.25rem] border border-gold/40 bg-[#fbf6ea] px-6 text-left shadow-[0_10px_28px_-16px_rgba(63,42,18,0.4)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-gold/80 hover:bg-[#f6ecd8] hover:shadow-[0_16px_34px_-16px_rgba(63,42,18,0.45)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep active:translate-y-0"
+                  className="group flex h-full min-h-[72px] w-full items-center justify-between rounded-[1.25rem] border border-gold/40 bg-[#fbf6ea] px-6 text-left shadow-[0_10px_28px_-16px_rgba(63,42,18,0.4)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-gold/80 hover:bg-[#f6ecd8] hover:shadow-[0_16px_34px_-16px_rgba(63,42,18,0.45)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep active:translate-y-0"
                 >
                   <span className="font-display text-lg font-semibold text-ink">
                     {city.name}

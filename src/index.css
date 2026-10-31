@@ -22,7 +22,7 @@ body,
 body {
   margin: 0;
   background-color: #f8f3e6;
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

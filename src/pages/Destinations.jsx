@@ -9,7 +9,7 @@ export default function Destinations() {
   const navigate = useNavigate();
 
   return (
-    <div className="page-anim relative flex min-h-dvh flex-col overflow-x-hidden bg-ivory font-sans text-ink antialiased">
+    <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 select-none">
         <img
           src="/img/zliij.png"
@@ -68,14 +68,14 @@ export default function Destinations() {
 
         <section
           aria-label="Choose a destination"
-          className="mt-6 flex min-h-0 flex-1 items-center justify-center"
+          className="mt-6 flex min-h-0 flex-1 flex-col justify-center lg:justify-start"
         >
-          <ul className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-2 sm:gap-5 sm:px-2 md:px-2 lg:mx-0 lg:grid lg:grid-cols-5 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0 xl:gap-7">
+          <ul className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-2 sm:gap-5 sm:px-2 md:px-2 lg:mx-0 lg:grid lg:flex-1 lg:grid-cols-5 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0 xl:gap-7">
             {destinations.map((city, index) => (
               <li
                 key={city.id}
                 style={{ animationDelay: `${80 * index}ms` }}
-                className="animate-fade-up w-[74%] shrink-0 snap-center sm:w-[46%] md:w-[38%] lg:w-auto lg:shrink"
+                className="animate-fade-up w-[74%] shrink-0 snap-center sm:w-[46%] md:w-[38%] lg:h-full lg:w-auto lg:shrink"
               >
                 <DestinationCard city={city} />
               </li>

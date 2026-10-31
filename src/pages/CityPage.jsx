@@ -44,7 +44,7 @@ export default function CityPage() {
   const active = CATEGORIES.find((c) => c.id === category);
 
   return (
-    <div className="page-anim relative flex min-h-dvh flex-col overflow-x-hidden bg-ivory font-sans text-ink antialiased">
+    <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
       <ZelligeEdges />
 
       <SiteNav
