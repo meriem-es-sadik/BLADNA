@@ -11,6 +11,7 @@ import {
   sortHotels,
 } from "../../services/hotelsService";
 import { fallbackAttribution } from "../../data/hotelsFallback";
+import { useI18n } from "../../i18n/LanguageContext";
 
 const PAGE_SIZE = 12;
 
@@ -30,6 +31,7 @@ function SkeletonCard() {
 }
 
 export default function HotelsSection({ city }) {
+  const { t } = useI18n();
   const [hotels, setHotels] = useState(() => getFallbackHotels(city));
   const [status, setStatus] = useState(hotels.length ? "ready" : "loading");
   const [liveStatus, setLiveStatus] = useState("loading");
@@ -93,22 +95,22 @@ export default function HotelsSection({ city }) {
 
   const retry = () => {
     forceRefresh.current = true;
-    setReloadToken((t) => t + 1);
+    setReloadToken((current) => current + 1);
   };
 
   if (status === "error") {
     return (
       <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
-        <h2 className="font-display text-2xl font-medium text-ink">Something went wrong</h2>
+        <h2 className="font-display text-2xl font-medium text-ink">{t("hotels.errorTitle")}</h2>
         <p className="mt-2 text-sm text-ink/60">
-          We couldn't load hotels in {city.name}. The public OpenStreetMap provider may be busy.
+          {t("hotels.errorBody", { city: city.name })}
         </p>
         <button
           type="button"
           onClick={retry}
           className="mt-5 rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-6 py-2.5 text-sm font-semibold text-[#3d270e] shadow transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
         >
-          Try again
+          {t("common.tryAgain")}
         </button>
       </div>
     );
@@ -133,17 +135,15 @@ export default function HotelsSection({ city }) {
     return (
       <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
         <h2 className="font-display text-2xl font-medium text-ink">
-          No mapped hotels found in {city.name}
+          {t("hotels.emptyTitle", { city: city.name })}
         </h2>
-        <p className="mt-2 text-sm text-ink/60">
-          OpenStreetMap has no accommodation records for this area right now.
-        </p>
+        <p className="mt-2 text-sm text-ink/60">{t("hotels.emptyBody")}</p>
         <button
           type="button"
           onClick={retry}
           className="mt-5 rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
         >
-          Try again
+          {t("common.tryAgain")}
         </button>
       </div>
     );
@@ -198,18 +198,16 @@ export default function HotelsSection({ city }) {
       </div>
 
       {liveStatus === "offline" && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/35 bg-[#f6ecd8]/70 px-4 py-3 text-left">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/35 bg-[#f6ecd8]/70 px-4 py-3 text-start">
           <p className="text-xs leading-relaxed text-ink/65">
-            Live OpenStreetMap data is temporarily unavailable. Showing{" "}
-            <strong className="font-semibold text-ink/80">{hotels.length} verified hotels</strong>{" "}
-            from BLADNA's bundled list.
+            {t("hotels.offline", { count: hotels.length })}
           </p>
           <button
             type="button"
             onClick={retry}
             className="rounded-full border border-gold/50 px-4 py-1.5 text-xs font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
           >
-            Retry live data
+            {t("hotels.retryLive")}
           </button>
         </div>
       )}
@@ -217,9 +215,9 @@ export default function HotelsSection({ city }) {
       {filtered.length === 0 ? (
         <div className="rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
           <h2 className="font-display text-xl font-medium text-ink">
-            No hotels match your search
+            {t("hotels.noMatchTitle")}
           </h2>
-          <p className="mt-2 text-sm text-ink/55">Try another name, area, or reset the filters.</p>
+          <p className="mt-2 text-sm text-ink/55">{t("hotels.noMatchBody")}</p>
           <button
             type="button"
             onClick={() => {
@@ -230,7 +228,7 @@ export default function HotelsSection({ city }) {
             }}
             className="mt-5 rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
           >
-            Reset filters
+            {t("hotels.resetFilters")}
           </button>
         </div>
       ) : (
@@ -243,8 +241,13 @@ export default function HotelsSection({ city }) {
 
           <div className="mt-8 text-center">
             <p className="text-xs text-ink/45">
-              Showing {Math.min(visible, filtered.length)} of {filtered.length} mapped hotels
-              {hotels.length !== filtered.length ? ` (from ${hotels.length} found)` : ""}
+              {t("hotels.showing", {
+                shown: Math.min(visible, filtered.length),
+                total: filtered.length,
+              })}
+              {hotels.length !== filtered.length
+                ? t("hotels.showingFrom", { count: hotels.length })
+                : ""}
             </p>
             {visible < filtered.length && (
               <button
@@ -252,7 +255,7 @@ export default function HotelsSection({ city }) {
                 onClick={() => setVisible((v) => v + PAGE_SIZE)}
                 className="mt-4 rounded-full border border-gold/50 px-7 py-3 text-sm font-semibold text-gold-deep transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
               >
-                Load More
+                {t("hotels.loadMore")}
               </button>
             )}
           </div>
@@ -260,18 +263,10 @@ export default function HotelsSection({ city }) {
       )}
 
       <p className="mt-8 text-center text-[11px] leading-relaxed text-ink/45">
-        Hotel data from{" "}
-        <a
-          href={fallbackAttribution.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-gold-deep underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
-        >
-          OpenStreetMap
-        </a>{" "}
-        contributors ({fallbackAttribution.license}). Bundled listings verified on{" "}
-        {fallbackAttribution.verifiedAt}. Photos via Wikimedia Commons under their stated
-        licenses. No prices or live availability are shown.
+        {t("hotels.attribution", {
+          license: fallbackAttribution.license,
+          date: fallbackAttribution.verifiedAt,
+        })}
       </p>
     </div>
   );

@@ -68,7 +68,7 @@ export const activitiesFallbackByCity = {
       "website": null,
       "phone": null,
       "wikidata": "Q2743636",
-      "wikimediaCommons": "File:Twin Center 2.jpg",
+      "wikimediaCommons": "File:Twin Center, Boulevard Mohamed Zerktouni, Casablanca.JPG",
       "historic": null,
       "tourism": null,
       "leisure": null,

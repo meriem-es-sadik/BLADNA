@@ -494,6 +494,42 @@ export const cityGuides = {
         "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dakhla_-_panoramio_(1).jpg"
       }
     ]
+  },
+  "oujda": {
+    "slug": "oujda",
+    "name": "Oujda",
+    "kicker": "Eastern Gateway",
+    "title": "Oujda",
+    "tagline": "The lively capital of the Oriental region",
+    "description": "Oujda is the largest city in Morocco's Oriental region and a cultural crossroads near the Algerian border. Its medina, the Grand Théâtre and the leafy Parc Lalla Aïcha sit beside a growing university district.",
+    "images": []
+  },
+  "beni-mellal": {
+    "slug": "beni-mellal",
+    "name": "Béni Mellal",
+    "kicker": "Atlas Oasis",
+    "title": "Béni Mellal",
+    "tagline": "Olive groves beneath the High Atlas",
+    "description": "Béni Mellal sits below the High Atlas in a fertile plain of olive and citrus groves. Climb to the Ain Asserdoun spring, look out from the historic Kasbah Bel Kush and explore the weekly markets of the Tadla plain.",
+    "images": []
+  },
+  "guelmim": {
+    "slug": "guelmim",
+    "name": "Guelmim",
+    "kicker": "Sahara Gateway",
+    "title": "Guelmim",
+    "tagline": "Where the Anti-Atlas opens onto the desert",
+    "description": "Guelmim is known as the gateway to the Sahara, set between the Anti-Atlas and the desert plains of Oued Noun. Its camel market, palm-lined oases and nearby Atlantic villages offer a slower, southern rhythm.",
+    "images": []
+  },
+  "laayoune": {
+    "slug": "laayoune",
+    "name": "Laâyoune",
+    "kicker": "Saharan Capital",
+    "title": "Laâyoune",
+    "tagline": "Saharan culture on the Atlantic edge",
+    "description": "Laâyoune is the largest city of the Laâyoune-Sakia El Hamra region, where Saharan traditions meet the Atlantic coast. Discover its camel market, craft cooperatives and the wide desert landscapes that surround the city.",
+    "images": []
   }
 };
 

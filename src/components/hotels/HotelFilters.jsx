@@ -1,3 +1,5 @@
+import { useI18n } from "../../i18n/LanguageContext";
+
 export default function HotelFilters({
   availableStars,
   availableTypes,
@@ -10,6 +12,7 @@ export default function HotelFilters({
   onReset,
   filtered,
 }) {
+  const { t } = useI18n();
   const starOptions = [5, 4, 3, 2, 1].filter((s) => availableStars.includes(s));
   const hasAnyFilter = stars !== null || type !== null;
 
@@ -27,7 +30,7 @@ export default function HotelFilters({
               : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")
           }
         >
-          All stars
+          {t("hotels.allStars")}
         </button>
         {starOptions.map((s) => (
           <button
@@ -60,38 +63,38 @@ export default function HotelFilters({
                 : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")
             }
           >
-            All types
+            {t("hotels.allTypes")}
           </button>
-          {availableTypes.map((t) => (
+          {availableTypes.map((option) => (
             <button
-              key={t.value}
+              key={option.value}
               type="button"
-              onClick={() => onType(type === t.value ? null : t.value)}
-              aria-pressed={type === t.value}
+              onClick={() => onType(type === option.value ? null : option.value)}
+              aria-pressed={type === option.value}
               className={
                 "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 " +
-                (type === t.value
+                (type === option.value
                   ? "border-[#c9a24b]/70 bg-[#c9a24b]/15 text-gold-deep"
                   : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")
               }
             >
-              {t.label}
+              {option.label}
             </button>
           ))}
         </div>
       )}
 
       <label className="flex items-center gap-2 text-xs text-ink/60">
-        <span className="sr-only sm:not-sr-only">Sort</span>
+        <span className="sr-only sm:not-sr-only">{t("hotels.sort")}</span>
         <select
           value={sort}
           onChange={(e) => onSort(e.target.value)}
           className="rounded-full border border-gold/35 bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-ink focus:border-gold/80 focus:outline-none focus:ring-2 focus:ring-[#c9a24b]/30"
         >
-          <option value="rating">Recommended</option>
-          <option value="stars">Stars high → low</option>
-          <option value="az">Name A → Z</option>
-          <option value="za">Name Z → A</option>
+          <option value="rating">{t("hotels.sortRecommended")}</option>
+          <option value="stars">{t("hotels.sortStars")}</option>
+          <option value="az">{t("hotels.sortAz")}</option>
+          <option value="za">{t("hotels.sortZa")}</option>
         </select>
       </label>
 
@@ -101,12 +104,15 @@ export default function HotelFilters({
           onClick={onReset}
           className="rounded-full px-2.5 py-1.5 text-xs font-semibold text-ink/50 underline-offset-2 transition-colors hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
         >
-          Reset
+          {t("hotels.reset")}
         </button>
       )}
 
-      <span className="ml-auto hidden text-xs text-ink/45 lg:inline">
-        {filtered} hotel{filtered === 1 ? "" : "s"} matching
+      <span className="ms-auto hidden text-xs text-ink/45 lg:inline">
+        {t("hotels.matching", {
+          count: filtered,
+          plural: filtered === 1 ? "" : "s",
+        })}
       </span>
     </div>
   );

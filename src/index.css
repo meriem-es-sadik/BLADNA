@@ -19,6 +19,10 @@ body,
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background-color: #f8f3e6;
@@ -26,6 +30,33 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+[dir="rtl"] body {
+  font-family: "Cairo", "Segoe UI", sans-serif;
+}
+
+[dir="rtl"] .font-display {
+  font-family: "Cairo", var(--font-display);
+}
+
+[dir="rtl"] .tracking-\[0\.35em\],
+[dir="rtl"] .tracking-\[0\.34em\],
+[dir="rtl"] .tracking-\[0\.3em\],
+[dir="rtl"] .tracking-\[0\.28em\],
+[dir="rtl"] .tracking-\[0\.26em\],
+[dir="rtl"] .tracking-\[0\.24em\],
+[dir="rtl"] .tracking-\[0\.22em\],
+[dir="rtl"] .tracking-\[0\.2em\],
+[dir="rtl"] .tracking-\[0\.18em\],
+[dir="rtl"] .tracking-\[0\.16em\],
+[dir="rtl"] .tracking-\[0\.14em\],
+[dir="rtl"] .tracking-\[0\.12em\] {
+  letter-spacing: 0;
+}
+
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
 }
 
 ::selection {

@@ -1,7 +1,6 @@
 import Background from "../components/Background";
 import HeroCard from "../components/HeroCard";
 import Logo from "../components/Logo";
-import SiteFooter from "../components/SiteFooter";
 
 export default function Home() {
   return (
@@ -15,8 +14,6 @@ export default function Home() {
           <HeroCard />
         </div>
       </main>
-
-      <SiteFooter />
     </div>
   );
 }

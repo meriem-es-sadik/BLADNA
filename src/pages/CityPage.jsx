@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { BedDouble, Compass, Utensils } from "lucide-react";
-import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
 import ZelligeEdges from "../components/ZelligeEdges";
 import CityHero from "../components/city/CityHero";
@@ -9,39 +8,42 @@ import HotelsSection from "../components/hotels/HotelsSection";
 import PlacesSection from "../components/places/PlacesSection";
 import { cities } from "../data/cities";
 import { getCityGuide } from "../data/cityGuides";
-
-const CATEGORIES = [
-  {
-    id: "hotels",
-    label: "Hotels",
-    icon: BedDouble,
-    blurb: "Real, community-mapped stays across Morocco.",
-  },
-  {
-    id: "restaurants",
-    label: "Restaurants",
-    icon: Utensils,
-    blurb: "Real, community-mapped places to eat across the city.",
-  },
-  {
-    id: "activities",
-    label: "Activities",
-    icon: Compass,
-    blurb: "Museums, monuments, parks and experiences worth your time.",
-  },
-];
+import { useI18n } from "../i18n/LanguageContext";
 
 export default function CityPage() {
   const { slug } = useParams();
+  const { t } = useI18n();
   const [category, setCategory] = useState("hotels");
-  const city = cities.find((c) => c.slug === slug);
+  const city = cities.find((candidate) => candidate.slug === slug);
 
   if (!city) {
     return <Navigate to="/cities" replace />;
   }
 
   const guide = getCityGuide(city.slug);
-  const active = CATEGORIES.find((c) => c.id === category);
+
+  const categories = [
+    {
+      id: "hotels",
+      label: t("nav.hotels"),
+      icon: BedDouble,
+      blurb: t("city.blurbHotels"),
+    },
+    {
+      id: "restaurants",
+      label: t("nav.restaurants"),
+      icon: Utensils,
+      blurb: t("city.blurbRestaurants"),
+    },
+    {
+      id: "activities",
+      label: t("nav.activities"),
+      icon: Compass,
+      blurb: t("city.blurbActivities"),
+    },
+  ];
+
+  const active = categories.find((item) => item.id === category) || categories[0];
 
   return (
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
@@ -49,7 +51,7 @@ export default function CityPage() {
 
       <SiteNav
         backTo="/cities"
-        backLabel="Back to Cities"
+        backLabel={t("city.backToCities")}
         category={category}
         onCategoryChange={setCategory}
       />
@@ -58,11 +60,11 @@ export default function CityPage() {
         <CityHero guide={guide} city={city} />
 
         <nav
-          aria-label="Place categories"
+          aria-label={t("city.categoriesAria")}
           className="mt-6 flex shrink-0 justify-center"
         >
           <div className="inline-flex items-center gap-1 rounded-full border border-gold/35 bg-white/60 p-1.5 shadow-[0_14px_34px_-18px_rgba(63,42,18,0.4)] backdrop-blur-md sm:gap-1.5">
-            {CATEGORIES.map((cat) => {
+            {categories.map((cat) => {
               const Icon = cat.icon;
               const isActive = cat.id === category;
               return (
@@ -90,12 +92,13 @@ export default function CityPage() {
           {category === "hotels" ? (
             <HotelsSection city={city} />
           ) : (
-            <PlacesSection city={city} kind={category === "restaurants" ? "restaurant" : "activity"} />
+            <PlacesSection
+              city={city}
+              kind={category === "restaurants" ? "restaurant" : "activity"}
+            />
           )}
         </section>
       </div>
-
-      <SiteFooter />
     </div>
   );
 }

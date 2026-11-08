@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { getFallbackPhoto } from "../../services/hotelPhotosService";
+import { useI18n } from "../../i18n/LanguageContext";
 
-const PLACEHOLDER = "/img/hotel-placeholder.svg";
+function illustrationLabel(kind, t) {
+  if (kind === "restaurant") return t("gallery.illustrativeRestaurant");
+  if (kind === "activity") return t("gallery.illustrativePlace");
+  return t("gallery.illustrativeHotel");
+}
 
 function Chevron({ direction }) {
   return (
@@ -11,7 +17,7 @@ function Chevron({ direction }) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-5 w-5"
+      className="h-5 w-5 rtl:rotate-180"
       aria-hidden="true"
     >
       {direction === "left" ? <path d="m15 18-6-6 6-6" /> : <path d="m9 18 6-6-6-6" />}
@@ -19,8 +25,12 @@ function Chevron({ direction }) {
   );
 }
 
-export default function HotelGallery({ images, name }) {
+export default function HotelGallery({ images, name, kind = "hotel", city }) {
+  const { t } = useI18n();
   const list = Array.isArray(images) ? images : [];
+  const signature = list.map((image) => image?.url || "").join("|");
+  const fallback = getFallbackPhoto({ kind, city, name, id: name });
+  const fallbackSrc = fallback?.url || "/img/hotel-placeholder.svg";
   const [active, setActive] = useState(0);
   const [failed, setFailed] = useState(() => new Set());
   const [lightbox, setLightbox] = useState(false);
@@ -35,11 +45,24 @@ export default function HotelGallery({ images, name }) {
   }, [name]);
 
   useEffect(() => {
+    setActive(0);
+    setFailed(new Set());
+  }, [signature]);
+
+  useEffect(() => {
     setActive((index) => Math.min(index, Math.max(0, list.length - 1)));
   }, [list.length]);
 
   const current = list[active] || null;
-  const showingPlaceholder = !current || failed.has(active);
+  const showingFallback = !current || failed.has(active);
+  const currentIsIllustrative = Boolean(current?.isIllustrative);
+  const illustration = showingFallback
+    ? fallback
+    : currentIsIllustrative
+      ? current
+      : null;
+  const isIllustrative = Boolean(illustration);
+  const displaySrc = showingFallback ? fallbackSrc : current.url;
   const hasMultiple = list.length > 1;
 
   const nextAvailable = (direction) => {
@@ -74,7 +97,7 @@ export default function HotelGallery({ images, name }) {
   };
 
   const openLightbox = () => {
-    if (!current || showingPlaceholder) return;
+    if (!current || showingFallback) return;
     returnFocus.current = document.activeElement;
     setLightbox(true);
   };
@@ -126,20 +149,27 @@ export default function HotelGallery({ images, name }) {
     return (
       <div className="relative overflow-hidden">
         <img
-          src={PLACEHOLDER}
-          alt=""
+          src={fallbackSrc}
+          alt={t("gallery.illustrativeAlt", { kind })}
           loading="lazy"
           decoding="async"
           className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
         />
-        <span className="absolute bottom-3 right-3 rounded-full border border-gold/30 bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/50 backdrop-blur-sm">
-          Illustration — no verified photo
+        <span
+          title={
+            fallback?.credit
+              ? `${t("common.illustrative")}: ${fallback.credit}${fallback.license ? ` (${fallback.license})` : ""}`
+              : t("common.illustrative")
+          }
+          className="absolute bottom-3 end-3 max-w-[calc(100%-1.5rem)] truncate rounded-full border border-gold/30 bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/55 backdrop-blur-sm"
+        >
+          {illustrationLabel(kind, t)}
         </span>
       </div>
     );
   }
 
-  const credit = current && !showingPlaceholder ? current : null;
+  const credit = current && !showingFallback && !currentIsIllustrative ? current : null;
 
   return (
     <div>
@@ -152,27 +182,42 @@ export default function HotelGallery({ images, name }) {
           type="button"
           onClick={openLightbox}
           className="block w-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-gold-deep"
-          aria-label={showingPlaceholder ? undefined : `Open photo ${active + 1} of ${list.length}`}
+          aria-label={
+            showingFallback
+              ? undefined
+              : t("gallery.openPhoto", { index: active + 1, total: list.length })
+          }
         >
           <img
-            src={showingPlaceholder ? PLACEHOLDER : current.url}
+            src={displaySrc}
             alt={
-              showingPlaceholder
-                ? ""
-                : `${name} — photo ${active + 1} of ${list.length}`
+              isIllustrative
+                ? t("gallery.illustrativeAlt", { kind })
+                : t("gallery.photoAlt", {
+                    name,
+                    index: active + 1,
+                    total: list.length,
+                  })
             }
             loading="lazy"
             decoding="async"
             onError={() => {
-              if (!showingPlaceholder) markFailed(active);
+              if (!showingFallback) markFailed(active);
             }}
             className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
           />
         </button>
 
-        {showingPlaceholder && (
-          <span className="absolute bottom-3 right-3 rounded-full border border-gold/30 bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/50 backdrop-blur-sm">
-            Illustration — no verified photo
+        {isIllustrative && (
+          <span
+            title={
+              illustration?.credit
+                ? `${t("common.illustrative")}: ${illustration.credit}${illustration.license ? ` (${illustration.license})` : ""}`
+                : t("common.illustrative")
+            }
+            className="absolute bottom-3 end-3 max-w-[calc(100%-1.5rem)] truncate rounded-full border border-gold/30 bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/55 backdrop-blur-sm"
+          >
+            {illustrationLabel(kind, t)}
           </span>
         )}
 
@@ -181,20 +226,20 @@ export default function HotelGallery({ images, name }) {
             <button
               type="button"
               onClick={() => move(-1)}
-              aria-label="Previous photo"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/50 bg-[#1b140c]/55 p-2 text-white backdrop-blur-sm transition hover:bg-[#1b140c]/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:left-3"
+              aria-label={t("gallery.previous")}
+              className="absolute start-2 top-1/2 -translate-y-1/2 rounded-full border border-white/50 bg-[#1b140c]/55 p-2 text-white backdrop-blur-sm transition hover:bg-[#1b140c]/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:start-3"
             >
               <Chevron direction="left" />
             </button>
             <button
               type="button"
               onClick={() => move(1)}
-              aria-label="Next photo"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/50 bg-[#1b140c]/55 p-2 text-white backdrop-blur-sm transition hover:bg-[#1b140c]/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-3"
+              aria-label={t("gallery.next")}
+              className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full border border-white/50 bg-[#1b140c]/55 p-2 text-white backdrop-blur-sm transition hover:bg-[#1b140c]/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:end-3"
             >
               <Chevron direction="right" />
             </button>
-            <span className="absolute right-3 top-3 rounded-full border border-white/40 bg-[#1b140c]/55 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+            <span className="absolute end-3 top-3 rounded-full border border-white/40 bg-[#1b140c]/55 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
               {active + 1} / {list.length}
             </span>
           </>
@@ -206,10 +251,10 @@ export default function HotelGallery({ images, name }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(event) => event.stopPropagation()}
-            title={`Photo: ${credit.credit}${credit.license ? ` (${credit.license})` : ""}`}
-            className="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] truncate rounded-full border border-gold/30 bg-white/85 px-2.5 py-1 text-[10px] font-semibold text-ink/60 backdrop-blur-sm hover:text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
+            title={`${t("common.photo", { credit: credit.credit })}${credit.license ? ` (${credit.license})` : ""}`}
+            className="absolute bottom-3 start-3 max-w-[calc(100%-1.5rem)] truncate rounded-full border border-gold/30 bg-white/85 px-2.5 py-1 text-[10px] font-semibold text-ink/60 backdrop-blur-sm hover:text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
           >
-            Photo: {credit.credit}
+            {t("common.photo", { credit: credit.credit })}
             {credit.license ? ` · ${credit.license}` : ""}
           </a>
         )}
@@ -222,7 +267,7 @@ export default function HotelGallery({ images, name }) {
               key={image.url}
               type="button"
               onClick={() => setActive(index)}
-              aria-label={`Show photo ${index + 1}`}
+              aria-label={t("gallery.showPhoto", { index: index + 1 })}
               aria-current={index === active}
               className={
                 "h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
@@ -232,7 +277,7 @@ export default function HotelGallery({ images, name }) {
               }
             >
               <img
-                src={failed.has(index) ? PLACEHOLDER : image.url}
+                src={failed.has(index) ? fallbackSrc : image.url}
                 alt=""
                 loading="lazy"
                 decoding="async"
@@ -245,16 +290,14 @@ export default function HotelGallery({ images, name }) {
 
       {list.some((image) => image.source === "google") && (
         <p className="border-b border-gold/20 bg-[#f6ecd8]/60 px-4 py-2 text-[10px] leading-relaxed text-ink/55 sm:px-6">
-          Some photos via{" "}
           <a
             href="https://www.google.com/maps"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold text-gold-deep underline-offset-2 hover:underline"
           >
-            Google
+            {t("gallery.google")}
           </a>
-          .
         </p>
       )}
 
@@ -263,7 +306,7 @@ export default function HotelGallery({ images, name }) {
           className="fixed inset-0 z-50 flex flex-col bg-[#120d08]/95 p-4 text-white sm:p-6"
           role="dialog"
           aria-modal="true"
-          aria-label={`${name} photo gallery`}
+          aria-label={t("gallery.dialog", { name })}
         >
           <div className="flex items-center justify-between gap-4">
             <p className="truncate font-display text-sm text-white/80 sm:text-base">{name}</p>
@@ -275,7 +318,7 @@ export default function HotelGallery({ images, name }) {
                 ref={closeRef}
                 type="button"
                 onClick={() => setLightbox(false)}
-                aria-label="Close photo gallery"
+                aria-label={t("gallery.close")}
                 className="rounded-full border border-white/40 p-2 text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5" aria-hidden="true">
@@ -291,8 +334,16 @@ export default function HotelGallery({ images, name }) {
             onTouchEnd={onTouchEnd}
           >
             <img
-              src={showingPlaceholder ? PLACEHOLDER : current.url}
-              alt={showingPlaceholder ? "" : `${name} — photo ${active + 1} of ${list.length}`}
+              src={displaySrc}
+              alt={
+                isIllustrative
+                  ? t("gallery.illustrativeAlt", { kind })
+                  : t("gallery.photoAlt", {
+                      name,
+                      index: active + 1,
+                      total: list.length,
+                    })
+              }
               className="max-h-full max-w-full object-contain"
             />
             {hasMultiple && (
@@ -300,16 +351,16 @@ export default function HotelGallery({ images, name }) {
                 <button
                   type="button"
                   onClick={() => move(-1)}
-                  aria-label="Previous photo"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-black/35 p-3 text-white backdrop-blur-sm transition hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  aria-label={t("gallery.previous")}
+                  className="absolute start-0 top-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-black/35 p-3 text-white backdrop-blur-sm transition hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   <Chevron direction="left" />
                 </button>
                 <button
                   type="button"
                   onClick={() => move(1)}
-                  aria-label="Next photo"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-black/35 p-3 text-white backdrop-blur-sm transition hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  aria-label={t("gallery.next")}
+                  className="absolute end-0 top-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-black/35 p-3 text-white backdrop-blur-sm transition hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   <Chevron direction="right" />
                 </button>
@@ -319,7 +370,7 @@ export default function HotelGallery({ images, name }) {
 
           {credit && (
             <p className="shrink-0 text-center text-[11px] leading-relaxed text-white/60">
-              Photo:{" "}
+              {t("common.photo", { credit: "" }).trim()}{" "}
               <a
                 href={credit.sourceUrl || credit.url}
                 target="_blank"
@@ -329,6 +380,14 @@ export default function HotelGallery({ images, name }) {
                 {credit.credit}
               </a>
               {credit.license ? ` · ${credit.license}` : ""}
+            </p>
+          )}
+          {isIllustrative && (
+            <p className="shrink-0 text-center text-[11px] leading-relaxed text-white/60">
+              {illustrationLabel(kind, t)}
+              {illustration?.credit
+                ? ` · ${t("common.photo", { credit: illustration.credit })}${illustration.license ? ` (${illustration.license})` : ""}`
+                : ""}
             </p>
           )}
         </div>

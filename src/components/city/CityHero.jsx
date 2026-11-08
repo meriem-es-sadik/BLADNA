@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { useI18n } from "../../i18n/LanguageContext";
 
 const AUTO_MS = 4800;
 const RESUME_DELAY_MS = 8000;
 
 export default function CityHero({ guide, city }) {
+  const { t } = useI18n();
   const images = guide?.images?.length ? guide.images : [];
   const [index, setIndex] = useState(0);
   const [previous, setPrevious] = useState(null);
@@ -156,7 +158,7 @@ export default function CityHero({ guide, city }) {
           <div className="flex items-start justify-between gap-4">
             <span className="inline-flex max-w-[70%] items-center gap-2 rounded-full border border-white/25 bg-[#1b1208]/35 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f4dfb0] backdrop-blur-md sm:text-[11px]">
               <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
-              Bladna city guide · {guide?.kicker || "Morocco"}
+              {t("city.guide")} · {guide?.kicker || t("city.defaultKicker")}
             </span>
 
             <div className="flex flex-col items-end gap-2">
@@ -167,7 +169,7 @@ export default function CityHero({ guide, city }) {
                     setHoverPaused(false);
                     setManualPaused((current) => !current);
                   }}
-                  aria-label={manualPaused ? "Resume automatic slideshow" : "Pause automatic slideshow"}
+                  aria-label={manualPaused ? t("city.resume") : t("city.pause")}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-[#1b1208]/40 text-white backdrop-blur-md transition hover:border-gold/80 hover:text-[#f4dfb0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                 >
                   {manualPaused ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
@@ -178,10 +180,10 @@ export default function CityHero({ guide, city }) {
                   href={active.sourceUrl || active.licenseUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={`Photo: ${active.credit} (${active.license})`}
+                  title={`${t("city.photoCredit", { credit: active.credit })} (${active.license})`}
                   className="max-w-[9rem] truncate rounded-full border border-white/20 bg-[#1b1208]/35 px-2.5 py-1 text-[10px] text-white/75 backdrop-blur-md transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:max-w-[16rem]"
                 >
-                  Photo: {active.credit} · {active.license}
+                  {t("city.photoCredit", { credit: active.credit })} · {active.license}
                 </a>
               )}
             </div>
@@ -189,7 +191,7 @@ export default function CityHero({ guide, city }) {
 
           <div className="max-w-2xl pb-7 sm:pb-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#f4dfb0]/90">
-              {guide?.tagline || "A city worth discovering"}
+              {guide?.tagline || t("city.defaultTagline")}
             </p>
             <h1
               id="city-hero-title"
@@ -198,7 +200,7 @@ export default function CityHero({ guide, city }) {
               {guide?.title || city.name}
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/80 sm:text-[15px]">
-              {guide?.description || "Explore the best places and experiences in your destination."}
+              {guide?.description || t("city.defaultDescription")}
             </p>
           </div>
         </div>
@@ -209,18 +211,18 @@ export default function CityHero({ guide, city }) {
               <button
                 type="button"
                 onClick={() => move(-1)}
-                aria-label="Previous city photo"
+                aria-label={t("city.previousPhoto")}
                 className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-[#1b1208]/40 text-white backdrop-blur-md transition hover:border-gold/80 hover:bg-[#1b1208]/65 hover:text-[#f4dfb0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
               >
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                <ChevronLeft className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
               </button>
               <button
                 type="button"
                 onClick={() => move(1)}
-                aria-label="Next city photo"
+                aria-label={t("city.nextPhoto")}
                 className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-[#1b1208]/40 text-white backdrop-blur-md transition hover:border-gold/80 hover:bg-[#1b1208]/65 hover:text-[#f4dfb0] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
               >
-                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                <ChevronRight className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
               </button>
             </div>
 
@@ -230,7 +232,7 @@ export default function CityHero({ guide, city }) {
                   key={image.src}
                   type="button"
                   onClick={() => goTo(imageIndex)}
-                  aria-label={`Show city photo ${imageIndex + 1} of ${total}`}
+                  aria-label={t("city.showPhoto", { index: imageIndex + 1, total })}
                   aria-current={imageIndex === index}
                   className={
                     "h-1.5 rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold " +
@@ -243,7 +245,11 @@ export default function CityHero({ guide, city }) {
         )}
 
         <span className="sr-only" aria-live="polite">
-          Photo {index + 1} of {total}: {active?.alt || city.name}
+          {t("city.photoStatus", {
+            index: index + 1,
+            total,
+            alt: active?.alt || city.name,
+          })}
         </span>
       </div>
     </section>

@@ -124,7 +124,7 @@ function parseRating(value) {
 
 function safeHttpUrl(value) {
   if (!value) return null;
-  let raw = String(value).trim().split(/[\s,]+/)[0];
+  let raw = String(value).trim().split(/\s+/)[0];
   if (!raw) return null;
   if (!/^[a-z][a-z0-9+.-]*:/i.test(raw)) raw = "https://" + raw;
   try {
@@ -177,7 +177,7 @@ export function normalizeImage(image) {
   };
 }
 
-function imagesFromTags(tags) {
+export function imagesFromTags(tags) {
   const list = [];
   const seen = new Set();
   const add = (image) => {
@@ -206,9 +206,12 @@ function imagesFromTags(tags) {
       .map((key) => tags[key]),
   ];
   for (const value of candidates) {
-    const direct = safeHttpUrl(value);
-    if (!direct) continue;
-    add({ url: direct, sourceUrl: direct, source: "wikimedia" });
+    if (!value) continue;
+    for (const part of String(value).split(";")) {
+      const direct = safeHttpUrl(part);
+      if (!direct) continue;
+      add({ url: direct, sourceUrl: direct, source: "wikimedia" });
+    }
   }
 
   return list;

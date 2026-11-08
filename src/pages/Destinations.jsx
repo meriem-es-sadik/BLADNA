@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import DestinationCard from "../components/DestinationCard";
-import SiteFooter from "../components/SiteFooter";
 import SiteNav from "../components/SiteNav";
 import { destinations } from "../data/destinations";
+import { useI18n } from "../i18n/LanguageContext";
 
 export default function Destinations() {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   return (
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
@@ -58,16 +59,16 @@ export default function Destinations() {
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-10">
         <section className="flex shrink-0 flex-col items-center text-center">
           <h1 className="mt-2 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
-            Find Your <span className="italic text-terra">Perfect Destination</span>
+            {t("destinations.titleA")}{" "}
+            <span className="italic text-terra">{t("destinations.titleB")}</span>
           </h1>
           <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-ink/70 sm:text-[15px]">
-            We&rsquo;re here to help you discover the perfect place for your
-            next Moroccan adventure.
+            {t("destinations.subtitle")}
           </p>
         </section>
 
         <section
-          aria-label="Choose a destination"
+          aria-label={t("destinations.listAria")}
           className="mt-6 flex min-h-0 flex-1 flex-col justify-center lg:justify-start"
         >
           <ul className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-2 sm:gap-5 sm:px-2 md:px-2 lg:mx-0 lg:grid lg:flex-1 lg:grid-cols-5 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0 xl:gap-7">
@@ -89,16 +90,14 @@ export default function Destinations() {
             onClick={() => navigate("/cities")}
             className="group inline-flex items-center gap-3 rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-8 py-4 text-sm font-semibold tracking-wide text-[#3d270e] shadow-[0_18px_40px_-14px_rgba(154,115,39,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-[0_22px_46px_-14px_rgba(154,115,39,0.65)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep active:translate-y-0 active:scale-100"
           >
-            Choose Your Destination
+            {t("destinations.cta")}
             <ArrowRight
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1"
               aria-hidden="true"
             />
           </button>
         </section>
       </div>
-
-      <SiteFooter />
     </div>
   );
 }

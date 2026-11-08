@@ -1,5 +1,6 @@
 import { activitiesFallbackByCity } from "../data/activitiesFallback";
 import { restaurantsFallbackByCity } from "../data/restaurantsFallback";
+import { imagesFromTags, normalizeImage } from "./hotelsService";
 
 const CACHE_MS = 5 * 60 * 1000;
 const cache = new Map();
@@ -143,10 +144,32 @@ export function formatPlace(record, kind, city) {
       ? `${typeLabel} in ${city.name}${record.area ? `, ${record.area}` : ""}.`
       : `${typeLabel} in ${city.name}${record.area ? `, ${record.area}` : ""}.`;
 
+  const images = [];
+  const seen = new Set();
+  for (const image of Array.isArray(record.images) ? record.images : []) {
+    const normalized = normalizeImage(image);
+    if (!normalized || seen.has(normalized.url)) continue;
+    seen.add(normalized.url);
+    images.push(normalized);
+  }
+  if (!images.length && record.image) {
+    const normalized = normalizeImage({
+      url: record.image,
+      credit: record.imageCredit,
+      license: record.imageLicense,
+      licenseUrl: record.imageLicenseUrl,
+      sourceUrl: record.imageSourceUrl,
+      source: record.imageSource || "wikimedia",
+    });
+    if (normalized) images.push(normalized);
+  }
+  const first = images[0] || null;
+
   return {
     id: `${kind}-${record.osmType}-${record.osmId}`,
     kind,
     city: city.name,
+    citySlug: city.slug,
     name: record.name,
     typeLabel,
     description,
@@ -159,8 +182,14 @@ export function formatPlace(record, kind, city) {
     openingHours: record.openingHours || null,
     website: normalizeWebsite(record.website),
     phone: record.phone || null,
-    image: null,
-    images: [],
+    image: first?.url || null,
+    images,
+    imageCredit: first?.credit || null,
+    imageLicense: first?.license || null,
+    imageLicenseUrl: first?.licenseUrl || null,
+    imageSourceUrl: first?.sourceUrl || null,
+    wikimediaCommons: record.wikimediaCommons || null,
+    wikidata: record.wikidata || null,
     mapUrl: mapUrl(record.lat, record.lon),
     sourceUrl: record.sourceUrl || null,
     sourceLabel: kind === "restaurant" ? "OpenStreetMap restaurant record" : "OpenStreetMap place record",
@@ -220,7 +249,7 @@ async function requestOverpass(query) {
   let lastError;
   for (const endpoint of OVERPASS_ENDPOINTS) {
     const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), 12000);
+    const timer = setTimeout(() => controller.abort(), 12000);
     try {
       const response = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, {
         method: "GET",
@@ -233,7 +262,7 @@ async function requestOverpass(query) {
     } catch (error) {
       lastError = error;
     } finally {
-      window.clearTimeout(timer);
+      clearTimeout(timer);
     }
   }
   throw lastError || new Error("Overpass unavailable");
@@ -271,6 +300,10 @@ function elementToRecord(element, kind) {
     tourism: tags.tourism || null,
     leisure: tags.leisure || null,
     natural: tags.natural || null,
+    images: imagesFromTags(tags),
+    image: tags.image || null,
+    wikimediaCommons: tags.wikimedia_commons || null,
+    wikidata: tags.wikidata || null,
     sourceUrl: `https://www.openstreetmap.org/${element.type}/${element.id}`,
     verifiedAt: new Date().toISOString().slice(0, 10),
   };
