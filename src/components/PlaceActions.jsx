@@ -1,9 +1,10 @@
 import { ExternalLink, MapPin } from "lucide-react";
 import { useI18n } from "../i18n/LanguageContext";
-import { buildMapUrl, safeExternalUrl } from "../utils/links";
+import { buildMapUrl, safeBookingUrl, safeExternalUrl } from "../utils/links";
 
 export default function PlaceActions({
   website,
+  bookingUrl,
   lat,
   lon,
   name,
@@ -14,6 +15,7 @@ export default function PlaceActions({
 }) {
   const { t } = useI18n();
   const site = safeExternalUrl(website);
+  const booking = safeBookingUrl(bookingUrl);
   const mapUrl = buildMapUrl({ lat, lon, name, city });
   const isCard = variant === "card";
 
@@ -35,6 +37,18 @@ export default function PlaceActions({
         >
           <ExternalLink className={iconClass} aria-hidden="true" />
           {t("common.visitWebsite")}
+        </a>
+      ) : null}
+      {booking ? (
+        <a
+          href={booking}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          className={base}
+        >
+          <ExternalLink className={iconClass} aria-hidden="true" />
+          {t("hotels.bookOnBooking")}
         </a>
       ) : null}
       {mapUrl ? (

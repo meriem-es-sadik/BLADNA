@@ -1,36 +1,52 @@
 export default function ZelligeEdges() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 select-none">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-clip select-none">
       <img
         src="/img/zliij.png"
         alt=""
         loading="eager"
-        className="absolute -left-44 -top-44 w-[380px] opacity-90 mix-blend-multiply sm:-left-52 sm:-top-52 sm:w-[470px]"
+        decoding="async"
+        className="absolute -start-28 -top-24 w-[220px] opacity-35 mix-blend-multiply sm:-start-36 sm:-top-28 sm:w-[300px] lg:w-[360px]"
         style={{
-          maskImage: "radial-gradient(circle at 25% 25%, black 28%, transparent 55%)",
-          WebkitMaskImage: "radial-gradient(circle at 25% 25%, black 28%, transparent 55%)",
+          maskImage: "radial-gradient(circle at 22% 22%, black 28%, transparent 58%)",
+          WebkitMaskImage: "radial-gradient(circle at 22% 22%, black 28%, transparent 58%)",
         }}
       />
       <img
         src="/img/zliij.png"
         alt=""
         loading="lazy"
-        className="absolute -right-44 top-[12%] hidden w-[330px] opacity-85 mix-blend-multiply sm:block"
+        decoding="async"
+        className="absolute -end-24 top-[18%] hidden w-[190px] opacity-28 mix-blend-multiply md:block lg:w-[250px]"
         style={{
-          maskImage: "radial-gradient(circle at 80% 50%, black 26%, transparent 52%)",
-          WebkitMaskImage: "radial-gradient(circle at 80% 50%, black 26%, transparent 52%)",
+          maskImage: "radial-gradient(circle at 78% 50%, black 24%, transparent 56%)",
+          WebkitMaskImage: "radial-gradient(circle at 78% 50%, black 24%, transparent 56%)",
         }}
       />
       <img
         src="/img/zliij.png"
         alt=""
         loading="lazy"
-        className="absolute -bottom-44 -right-48 w-[380px] opacity-80 mix-blend-multiply sm:-bottom-52 sm:-right-52 sm:w-[460px]"
+        decoding="async"
+        className="absolute -start-20 bottom-[22%] hidden w-[170px] opacity-22 mix-blend-multiply lg:block"
         style={{
-          maskImage: "radial-gradient(circle at 70% 70%, black 28%, transparent 55%)",
-          WebkitMaskImage: "radial-gradient(circle at 70% 70%, black 28%, transparent 55%)",
+          maskImage: "radial-gradient(circle at 30% 60%, black 24%, transparent 56%)",
+          WebkitMaskImage: "radial-gradient(circle at 30% 60%, black 24%, transparent 56%)",
         }}
       />
+      <img
+        src="/img/zliij.png"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="absolute -bottom-24 -end-28 w-[220px] opacity-30 mix-blend-multiply sm:-bottom-28 sm:-end-36 sm:w-[300px] lg:w-[360px]"
+        style={{
+          maskImage: "radial-gradient(circle at 72% 72%, black 28%, transparent 58%)",
+          WebkitMaskImage: "radial-gradient(circle at 72% 72%, black 28%, transparent 58%)",
+        }}
+      />
+      <div className="absolute inset-y-0 start-0 hidden w-px bg-linear-to-b from-transparent via-gold/20 to-transparent sm:block" />
+      <div className="absolute inset-y-0 end-0 hidden w-px bg-linear-to-b from-transparent via-gold/20 to-transparent sm:block" />
     </div>
   );
 }

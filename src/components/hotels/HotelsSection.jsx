@@ -3,6 +3,7 @@ import HotelCard from "./HotelCard";
 import HotelDetails from "./HotelDetails";
 import HotelFilters from "./HotelFilters";
 import HotelSearch from "./HotelSearch";
+import SectionIntro from "../SectionIntro";
 import {
   getFallbackHotels,
   getHotels,
@@ -30,7 +31,13 @@ function SkeletonCard() {
   );
 }
 
-export default function HotelsSection({ city }) {
+export default function HotelsSection({
+  city,
+  showHeader = false,
+  kicker,
+  heading,
+  blurb,
+}) {
   const { t } = useI18n();
   const [hotels, setHotels] = useState(() => getFallbackHotels(city));
   const [status, setStatus] = useState(hotels.length ? "ready" : "loading");
@@ -93,6 +100,10 @@ export default function HotelsSection({ city }) {
     return [...labels].map((label) => ({ value: label, label }));
   }, [hotels]);
 
+  const headingText = heading || t("city.hotelsTitle", { city: city.name });
+  const introText = blurb || t("city.hotelsIntro");
+  const kickerText = kicker || t("city.hotelsKicker");
+
   const retry = () => {
     forceRefresh.current = true;
     setReloadToken((current) => current + 1);
@@ -100,25 +111,35 @@ export default function HotelsSection({ city }) {
 
   if (status === "error") {
     return (
-      <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
-        <h2 className="font-display text-2xl font-medium text-ink">{t("hotels.errorTitle")}</h2>
-        <p className="mt-2 text-sm text-ink/60">
-          {t("hotels.errorBody", { city: city.name })}
-        </p>
-        <button
-          type="button"
-          onClick={retry}
-          className="mt-5 rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-6 py-2.5 text-sm font-semibold text-[#3d270e] shadow transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-        >
-          {t("common.tryAgain")}
-        </button>
+      <div className="w-full">
+        {showHeader ? (
+          <SectionIntro kicker={kickerText} title={headingText} intro={introText} className="mb-8" />
+        ) : null}
+        <div className="rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
+          <h2 className="font-display text-2xl font-medium text-ink">
+            {t("hotels.emptyTitle", { city: city.name })}
+          </h2>
+          <p className="mt-2 text-sm text-ink/60">
+            {t("hotels.errorBody", { city: city.name })}
+          </p>
+          <button
+            type="button"
+            onClick={retry}
+            className="mt-5 rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-6 py-2.5 text-sm font-semibold text-[#3d270e] shadow transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+          >
+            {t("common.tryAgain")}
+          </button>
+        </div>
       </div>
     );
   }
 
   if (status === "loading") {
     return (
-      <div className="w-full">
+      <div className="w-full" aria-busy="true">
+        {showHeader ? (
+          <SectionIntro kicker={kickerText} title={headingText} intro={introText} className="mb-8" />
+        ) : null}
         <div className="mb-6 flex justify-center">
           <div className="h-10 w-64 animate-pulse rounded-full border border-gold/25 bg-white/50" />
         </div>
@@ -133,18 +154,23 @@ export default function HotelsSection({ city }) {
 
   if (status === "empty") {
     return (
-      <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
-        <h2 className="font-display text-2xl font-medium text-ink">
-          {t("hotels.emptyTitle", { city: city.name })}
-        </h2>
-        <p className="mt-2 text-sm text-ink/60">{t("hotels.emptyBody")}</p>
-        <button
-          type="button"
-          onClick={retry}
-          className="mt-5 rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-        >
-          {t("common.tryAgain")}
-        </button>
+      <div className="w-full">
+        {showHeader ? (
+          <SectionIntro kicker={kickerText} title={headingText} intro={introText} className="mb-8" />
+        ) : null}
+        <div className="rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
+          <h2 className="font-display text-2xl font-medium text-ink">
+            {t("hotels.emptyTitle", { city: city.name })}
+          </h2>
+          <p className="mt-2 text-sm text-ink/60">{t("hotels.emptyBody")}</p>
+          <button
+            type="button"
+            onClick={retry}
+            className="mt-5 rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+          >
+            {t("common.tryAgain")}
+          </button>
+        </div>
       </div>
     );
   }
@@ -161,7 +187,10 @@ export default function HotelsSection({ city }) {
 
   return (
     <div className="w-full">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      {showHeader ? (
+        <SectionIntro kicker={kickerText} title={headingText} intro={introText} className="mb-8" />
+      ) : null}
+      <div className="mb-6 flex flex-col gap-3 rounded-[1.35rem] border border-gold/25 bg-white/55 p-3 shadow-[0_14px_34px_-28px_rgba(63,42,18,0.45)] backdrop-blur-sm sm:p-4 lg:flex-row lg:items-center lg:justify-between">
         <HotelSearch
           value={query}
           onChange={(v) => {
@@ -198,7 +227,7 @@ export default function HotelsSection({ city }) {
       </div>
 
       {liveStatus === "offline" && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/35 bg-[#f6ecd8]/70 px-4 py-3 text-start">
+        <div role="status" className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/35 bg-[#f6ecd8]/70 px-4 py-3 text-start">
           <p className="text-xs leading-relaxed text-ink/65">
             {t("hotels.offline", { count: hotels.length })}
           </p>
@@ -265,7 +294,6 @@ export default function HotelsSection({ city }) {
       <p className="mt-8 text-center text-[11px] leading-relaxed text-ink/45">
         {t("hotels.attribution", {
           license: fallbackAttribution.license,
-          date: fallbackAttribution.verifiedAt,
         })}
       </p>
     </div>

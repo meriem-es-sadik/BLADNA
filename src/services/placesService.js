@@ -1,6 +1,7 @@
 import { activitiesFallbackByCity } from "../data/activitiesFallback";
 import { restaurantsFallbackByCity } from "../data/restaurantsFallback";
 import { imagesFromTags, normalizeImage } from "./hotelsService";
+import { normalizeDataProvenance } from "../utils/dataProvenance";
 
 const CACHE_MS = 5 * 60 * 1000;
 const cache = new Map();
@@ -164,9 +165,14 @@ export function formatPlace(record, kind, city) {
     if (normalized) images.push(normalized);
   }
   const first = images[0] || null;
+  const provenance = normalizeDataProvenance(
+    record,
+    record.isFallback ? "bladna_fallback" : "osm"
+  );
 
   return {
     id: `${kind}-${record.osmType}-${record.osmId}`,
+    ...provenance,
     kind,
     city: city.name,
     citySlug: city.slug,
@@ -193,7 +199,6 @@ export function formatPlace(record, kind, city) {
     mapUrl: mapUrl(record.lat, record.lon),
     sourceUrl: record.sourceUrl || null,
     sourceLabel: kind === "restaurant" ? "OpenStreetMap restaurant record" : "OpenStreetMap place record",
-    verifiedAt: record.verifiedAt || null,
     searchText: normalizeText(
       [record.name, record.area, record.address, record.cuisine, typeLabel, noun].join(" ")
     ),
@@ -203,7 +208,21 @@ export function formatPlace(record, kind, city) {
 export function getFallbackPlaces(city, kind) {
   const source =
     kind === "restaurant" ? restaurantsFallbackByCity[city.slug] : activitiesFallbackByCity[city.slug];
-  return (source || []).map((record) => formatPlace(record, kind, city));
+  return (source || []).map((record) =>
+    formatPlace(
+      {
+        ...record,
+        dataProvider: "bladna_fallback",
+        verificationStatus: "unreviewed",
+        lastCheckedAt: null,
+        legacyVerifiedAt: record.verifiedAt || null,
+        verifiedAt: null,
+        isFallback: true,
+      },
+      kind,
+      city
+    )
+  );
 }
 
 export function mergePlaces(fallback, live, kind, city) {
@@ -305,17 +324,27 @@ function elementToRecord(element, kind) {
     wikimediaCommons: tags.wikimedia_commons || null,
     wikidata: tags.wikidata || null,
     sourceUrl: `https://www.openstreetmap.org/${element.type}/${element.id}`,
-    verifiedAt: new Date().toISOString().slice(0, 10),
+    dataProvider: "osm",
+    verificationStatus: "unreviewed",
+    lastCheckedAt: null,
+    legacyVerifiedAt: null,
+    verifiedAt: null,
   };
 }
 
-export function getPlaces(city, kind) {
+export function getPlaces(city, kind, options = {}) {
+  const { force = false } = options;
   const key = `${city.slug}:${kind}`;
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.time < CACHE_MS) {
-    return Promise.resolve(cached.data);
+  if (force) {
+    cache.delete(key);
+  } else {
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.time < CACHE_MS) {
+      return Promise.resolve(cached.data);
+    }
   }
-  if (inflight.has(key)) return inflight.get(key);
+  if (!force && inflight.has(key)) return inflight.get(key);
+  if (force && inflight.has(key)) inflight.delete(key);
 
   const promise = requestOverpass(buildQuery(city, kind))
     .then((elements) =>

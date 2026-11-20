@@ -1,6 +1,8 @@
 import { hotelsFallbackByCity } from "../data/hotelsFallback";
+import { normalizeDataProvenance } from "../utils/dataProvenance";
+import { safeBookingUrl } from "../utils/links";
 
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v5";
 const CACHE_TTL = 24 * 60 * 60 * 1000;
 const SEARCH_RADIUS = 9000;
 const REQUEST_TIMEOUT = 20000;
@@ -64,7 +66,16 @@ function createAbortError() {
   return error;
 }
 
-async function fetchEndpoint(url, query, signal) {
+function isOverpassError(err) {
+  if (!err) return false;
+  const msg = err.message || "";
+  const status = err.status ?? err?.status;
+  if (msg.includes("HTTP 5") || status >= 500 && status <= 599) return true;
+  if (msg.includes("timed out") || msg.includes("AbortError")) return true;
+  return false;
+}
+
+async function fetchEndpoint(url, query, signal, attempt = 1) {
   const controller = new AbortController();
   let timedOut = false;
   const onAbort = () => controller.abort();
@@ -98,16 +109,17 @@ async function fetchEndpoint(url, query, signal) {
 
 async function runQuery(query, signal) {
   let lastError = null;
+  const triedErrors = [];
   for (const url of ENDPOINTS) {
     if (signal?.aborted) throw createAbortError();
     try {
       return await fetchEndpoint(url, query, signal);
     } catch (err) {
       if (err.name === "AbortError" && signal?.aborted) throw err;
-      lastError = err;
+      triedErrors.push({ url, error: err });
     }
   }
-  throw lastError || new Error("All data providers failed");
+  throw lastError || new Error("Overpass API unavailable after " + ENDPOINTS.length + " attempts");
 }
 
 function parseStars(value) {
@@ -282,6 +294,10 @@ function finalizeHotel(data, city) {
     if (normalized) images.push(normalized);
   }
   const first = images[0] || null;
+  const provenance = normalizeDataProvenance(
+    data,
+    data.isFallback ? "bladna_fallback" : "osm"
+  );
   const description = `${typeLabel}${data.stars ? ` · ${data.stars}-star` : ""} · ${city.name}${area ? ` · ${area}` : ""}`;
   const searchText = normalizeText(
     [
@@ -296,6 +312,7 @@ function finalizeHotel(data, city) {
   );
   return {
     ...data,
+    ...provenance,
     city: city.name,
     citySlug: city.slug,
     type,
@@ -303,6 +320,7 @@ function finalizeHotel(data, city) {
     isRiad: typeLabel === "Riad",
     area,
     address,
+    bookingUrl: safeBookingUrl(data.bookingUrl) || null,
     amenities,
     images,
     image: first?.url || null,
@@ -347,6 +365,10 @@ function toHotel(element, city) {
       wikidata: tags.wikidata || null,
       wikimediaCommons: tags.wikimedia_commons || null,
       sourceUrl: `https://www.openstreetmap.org/${element.type}/${element.id}`,
+      dataProvider: "osm",
+      verificationStatus: "unreviewed",
+      lastCheckedAt: null,
+      legacyVerifiedAt: null,
       verifiedAt: null,
       lat,
       lon,
@@ -374,6 +396,7 @@ export function getFallbackHotels(city) {
         area: record.area || null,
         addrCity: city.name,
         website: safeHttpUrl(record.website),
+        bookingUrl: record.bookingUrl || null,
         phone: record.phone || null,
         images: record.images || [],
         image: record.image || null,
@@ -384,7 +407,11 @@ export function getFallbackHotels(city) {
         wikidata: record.wikidata || null,
         wikimediaCommons: record.wikimediaCommons || null,
         sourceUrl: record.sourceUrl || null,
-        verifiedAt: record.verifiedAt || null,
+        dataProvider: "bladna_fallback",
+        verificationStatus: "unreviewed",
+        lastCheckedAt: null,
+        legacyVerifiedAt: record.verifiedAt || null,
+        verifiedAt: null,
         lat: record.lat,
         lon: record.lon,
         amenities: [],
@@ -429,12 +456,17 @@ export function mergeHotels(fallback, live, city) {
           stars: hotel.stars ?? base.stars,
           rating: hotel.rating ?? base.rating,
           website: hotel.website || base.website,
+          bookingUrl: hotel.bookingUrl || base.bookingUrl,
           phone: hotel.phone || base.phone,
           images: [...(hotel.images || []), ...(base.images || [])],
           wikidata: hotel.wikidata || base.wikidata,
           wikimediaCommons: hotel.wikimediaCommons || base.wikimediaCommons,
           sourceUrl: hotel.sourceUrl || base.sourceUrl,
-          verifiedAt: hotel.verifiedAt || base.verifiedAt,
+          dataProvider: hotel.dataProvider || base.dataProvider,
+          verificationStatus: hotel.verificationStatus || base.verificationStatus || "unreviewed",
+          lastCheckedAt: hotel.lastCheckedAt || base.lastCheckedAt || null,
+          legacyVerifiedAt: hotel.legacyVerifiedAt || base.legacyVerifiedAt || null,
+          verifiedAt: null,
           address: hotel.address || base.address,
           area: hotel.area || base.area,
           amenities: hotel.amenities?.length ? hotel.amenities : base.amenities,

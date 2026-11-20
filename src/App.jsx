@@ -1,12 +1,18 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import SiteFooter from "./components/SiteFooter";
+import { ContactProvider } from "./context/ContactContext";
 import { useI18n } from "./i18n/LanguageContext";
 import Home from "./pages/Home";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const Cities = lazy(() => import("./pages/Cities"));
 const CityPage = lazy(() => import("./pages/CityPage"));
 const Destinations = lazy(() => import("./pages/Destinations"));
+const AboutPage = lazy(() => import("./pages/About"));
+const HotelsPage = lazy(() => import("./pages/CityHotels"));
+const RestaurantsPage = lazy(() => import("./pages/CityRestaurants"));
+const ActivitiesPage = lazy(() => import("./pages/CityActivities"));
 
 function PageLoader() {
   const { t } = useI18n();
@@ -27,16 +33,24 @@ export default function App() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <Suspense fallback={<PageLoader />}>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/destinations" element={<Destinations />} />
-          <Route path="/cities" element={<Cities />} />
-          <Route path="/cities/:slug" element={<CityPage />} />
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </Suspense>
-      <SiteFooter />
+      <ContactProvider>
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home />} />
+              <Route path="/destinations" element={<Destinations />} />
+              <Route path="/cities" element={<Cities />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/cities/:city/hotels" element={<HotelsPage />} />
+              <Route path="/cities/:city/restaurants" element={<RestaurantsPage />} />
+              <Route path="/cities/:city/activities" element={<ActivitiesPage />} />
+              <Route path="/cities/:slug" element={<CityPage />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+        <SiteFooter />
+      </ContactProvider>
     </div>
   );
 }

@@ -502,7 +502,24 @@ export const cityGuides = {
     "title": "Oujda",
     "tagline": "The lively capital of the Oriental region",
     "description": "Oujda is the largest city in Morocco's Oriental region and a cultural crossroads near the Algerian border. Its medina, the Grand Théâtre and the leafy Parc Lalla Aïcha sit beside a growing university district.",
-    "images": []
+    "images": [
+      {
+        "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Oujda_vue_g%C3%A9n%C3%A9rale_003.JPG/1920px-Oujda_vue_g%C3%A9n%C3%A9rale_003.JPG",
+        "alt": "A general view across Oujda",
+        "credit": "Moonik",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Oujda_vue_g%C3%A9n%C3%A9rale_003.JPG"
+      },
+      {
+        "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/FARAJI_Brahim_-_LA_GRANDE_MOSQUEE_DU_MEDINA_OUJDA_-_Septembre2015.jpg/1920px-FARAJI_Brahim_-_LA_GRANDE_MOSQUEE_DU_MEDINA_OUJDA_-_Septembre2015.jpg",
+        "alt": "The Great Mosque of the medina in Oujda",
+        "credit": "Farajiibrahim",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:FARAJI_Brahim_-_LA_GRANDE_MOSQUEE_DU_MEDINA_OUJDA_-_Septembre2015.jpg"
+      }
+    ]
   },
   "beni-mellal": {
     "slug": "beni-mellal",
@@ -511,7 +528,24 @@ export const cityGuides = {
     "title": "Béni Mellal",
     "tagline": "Olive groves beneath the High Atlas",
     "description": "Béni Mellal sits below the High Atlas in a fertile plain of olive and citrus groves. Climb to the Ain Asserdoun spring, look out from the historic Kasbah Bel Kush and explore the weekly markets of the Tadla plain.",
-    "images": []
+    "images": [
+      {
+        "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Beni_Mellal_city_center_2019.jpg/1920px-Beni_Mellal_city_center_2019.jpg",
+        "alt": "The city centre of Béni Mellal",
+        "credit": "Abdeaitali",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Beni_Mellal_city_center_2019.jpg"
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Main_street_of_Beni_Mellal_%28in_the_background_Mount_Tassemit%29.jpg",
+        "alt": "A main street in Béni Mellal with Mount Tassemit in the background",
+        "credit": "Peritlukns",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Main_street_of_Beni_Mellal_(in_the_background_Mount_Tassemit).jpg"
+      }
+    ]
   },
   "guelmim": {
     "slug": "guelmim",
@@ -520,7 +554,24 @@ export const cityGuides = {
     "title": "Guelmim",
     "tagline": "Where the Anti-Atlas opens onto the desert",
     "description": "Guelmim is known as the gateway to the Sahara, set between the Anti-Atlas and the desert plains of Oued Noun. Its camel market, palm-lined oases and nearby Atlantic villages offer a slower, southern rhythm.",
-    "images": []
+    "images": [
+      {
+        "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Guelmim_aerial_photograph.jpg/1920px-Guelmim_aerial_photograph.jpg",
+        "alt": "An aerial view of Guelmim and its oasis",
+        "credit": "acediscovery",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Guelmim_aerial_photograph.jpg"
+      },
+      {
+        "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Westliches_Stadttor_von_Guelmim_in_Marokko.jpg/1920px-Westliches_Stadttor_von_Guelmim_in_Marokko.jpg",
+        "alt": "The western city gate of Guelmim",
+        "credit": "Mhobl",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Westliches_Stadttor_von_Guelmim_in_Marokko.jpg"
+      }
+    ]
   },
   "laayoune": {
     "slug": "laayoune",
@@ -529,7 +580,24 @@ export const cityGuides = {
     "title": "Laâyoune",
     "tagline": "Saharan culture on the Atlantic edge",
     "description": "Laâyoune is the largest city of the Laâyoune-Sakia El Hamra region, where Saharan traditions meet the Atlantic coast. Discover its camel market, craft cooperatives and the wide desert landscapes that surround the city.",
-    "images": []
+    "images": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Mosque_moulay_abd_el_aziz_laayoune.jpg",
+        "alt": "The Moulay Abd el Aziz Mosque in Laâyoune",
+        "credit": "Alexander Leisser",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mosque_moulay_abd_el_aziz_laayoune.jpg"
+      },
+      {
+        "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/El_Aioun%2C_Morocco_-_panoramio_-_zirar_%2813%29.jpg/1920px-El_Aioun%2C_Morocco_-_panoramio_-_zirar_%2813%29.jpg",
+        "alt": "A view across El Aioun, Laâyoune",
+        "credit": "zirar",
+        "license": "CC BY 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:El_Aioun,_Morocco_-_panoramio_-_zirar_(13).jpg"
+      }
+    ]
   }
 };
 

@@ -3,7 +3,6 @@ import { categoryFallbackPhotos, cityFallbackPhotos } from "../data/fallbackPhot
 
 const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
 const WIKIDATA_API = "https://www.wikidata.org/w/api.php";
-const GOOGLE_ENABLED = import.meta.env.VITE_GOOGLE_PLACES_ENABLED === "true";
 const MAX_PHOTOS = 12;
 
 const STOP_WORDS = new Set([
@@ -577,50 +576,6 @@ function mergeImages(list) {
   return out;
 }
 
-async function fetchGooglePhotos(entity, signal) {
-  if (!GOOGLE_ENABLED) return [];
-  try {
-    const res = await withRequestSlot(() =>
-      fetch("/api/hotels/photos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          name: entity.name,
-          address: entity.address,
-          city: entity.city,
-          lat: entity.lat,
-          lon: entity.lon,
-        }),
-        signal,
-      })
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (!data?.configured || !Array.isArray(data.photos)) return [];
-    const placeUrl =
-      data.placeUrl ||
-      (data.placeId
-        ? `https://www.google.com/maps/place/?q=place_id:${encodeURIComponent(data.placeId)}`
-        : "https://www.google.com/maps");
-    const base =
-      typeof window !== "undefined" ? window.location.origin : "http://localhost";
-    return data.photos
-      .map((photo) =>
-        normalizeImage({
-          url: new URL(photo.url, base).href,
-          credit: "Google",
-          license: "Google Maps photo",
-          sourceUrl: placeUrl,
-          source: "google",
-        })
-      )
-      .filter(Boolean);
-  } catch (error) {
-    if (error.name === "AbortError") throw error;
-    return [];
-  }
-}
-
 function normalizeExistingImages(entity) {
   const images = [];
   const seen = new Set();
@@ -780,7 +735,6 @@ async function resolvePhotos(entity, signal) {
 
   const added = await hydrateImages(images.slice(existing.length), signal);
   const hydrated = [...existing, ...added];
-  hydrated.push(...(await fetchGooglePhotos(entity, signal)));
   const merged = mergeImages(hydrated);
   return merged.length ? merged : [getFallbackPhoto(entity)];
 }
@@ -846,11 +800,6 @@ async function resolvePrimary(entity, signal) {
     } catch (error) {
       if (error.name === "AbortError") throw error;
     }
-  }
-
-  if (GOOGLE_ENABLED) {
-    const photos = await fetchGooglePhotos(entity, signal);
-    if (photos.length) return photos[0];
   }
 
   return getFallbackPhoto(entity);

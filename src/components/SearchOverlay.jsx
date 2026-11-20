@@ -62,7 +62,7 @@ export default function SearchOverlay({ open, onClose }) {
           title: regionName(region, lang),
           subtitle: t("search.citiesCount", { count }),
           badge: null,
-          to: `/cities#region-${region.id}`,
+          to: "/cities",
           haystack: normalize([...Object.values(region.name), "Morocco", "Maroc"].join(" ")),
         };
       }),

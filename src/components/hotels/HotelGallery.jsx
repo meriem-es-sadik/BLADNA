@@ -147,14 +147,16 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
 
   if (!list.length) {
     return (
-      <div className="relative overflow-hidden">
-        <img
-          src={fallbackSrc}
-          alt={t("gallery.illustrativeAlt", { kind })}
-          loading="lazy"
-          decoding="async"
-          className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
-        />
+      <div className="relative overflow-hidden bg-[#efe3c8]">
+        <div className="aspect-[16/9] w-full sm:aspect-[21/9]">
+          <img
+            src={fallbackSrc}
+            alt={t("gallery.illustrativeAlt", { kind })}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
+        </div>
         <span
           title={
             fallback?.credit
@@ -170,43 +172,46 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
   }
 
   const credit = current && !showingFallback && !currentIsIllustrative ? current : null;
+  const mainImage = (
+    <img
+      src={displaySrc}
+      alt={
+        isIllustrative
+          ? t("gallery.illustrativeAlt", { kind })
+          : t("gallery.photoAlt", {
+              name,
+              index: active + 1,
+              total: list.length,
+            })
+      }
+      loading="lazy"
+      decoding="async"
+      onError={() => {
+        if (!showingFallback) markFailed(active);
+      }}
+      className="h-full w-full object-cover"
+    />
+  );
 
   return (
     <div>
       <div
-        className="relative bg-[#efe4ce]"
+        className="relative bg-[#efe3c8]"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <button
-          type="button"
-          onClick={openLightbox}
-          className="block w-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-gold-deep"
-          aria-label={
-            showingFallback
-              ? undefined
-              : t("gallery.openPhoto", { index: active + 1, total: list.length })
-          }
-        >
-          <img
-            src={displaySrc}
-            alt={
-              isIllustrative
-                ? t("gallery.illustrativeAlt", { kind })
-                : t("gallery.photoAlt", {
-                    name,
-                    index: active + 1,
-                    total: list.length,
-                  })
-            }
-            loading="lazy"
-            decoding="async"
-            onError={() => {
-              if (!showingFallback) markFailed(active);
-            }}
-            className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
-          />
-        </button>
+        {showingFallback ? (
+          <div className="aspect-[16/9] w-full sm:aspect-[21/9]">{mainImage}</div>
+        ) : (
+          <button
+            type="button"
+            onClick={openLightbox}
+            className="block aspect-[16/9] w-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-gold-deep sm:aspect-[21/9]"
+            aria-label={t("gallery.openPhoto", { index: active + 1, total: list.length })}
+          >
+            {mainImage}
+          </button>
+        )}
 
         {isIllustrative && (
           <span
@@ -221,7 +226,7 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
           </span>
         )}
 
-        {hasMultiple && (
+        {hasMultiple && !showingFallback && (
           <>
             <button
               type="button"

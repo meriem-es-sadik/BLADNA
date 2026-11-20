@@ -24,7 +24,7 @@ export default function HotelFilters({
           onClick={() => onStars(null)}
           aria-pressed={stars === null}
           className={
-            "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 " +
+            "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
             (stars === null
               ? "border-[#c9a24b]/70 bg-[#c9a24b]/15 text-gold-deep"
               : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")
@@ -39,7 +39,7 @@ export default function HotelFilters({
             onClick={() => onStars(stars === s ? null : s)}
             aria-pressed={stars === s}
             className={
-              "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 " +
+              "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
               (stars === s
                 ? "border-[#c9a24b]/70 bg-[#c9a24b]/15 text-gold-deep"
                 : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")
@@ -57,7 +57,7 @@ export default function HotelFilters({
             onClick={() => onType(null)}
             aria-pressed={type === null}
             className={
-              "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 " +
+              "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
               (type === null
                 ? "border-[#c9a24b]/70 bg-[#c9a24b]/15 text-gold-deep"
                 : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")
@@ -72,7 +72,7 @@ export default function HotelFilters({
               onClick={() => onType(type === option.value ? null : option.value)}
               aria-pressed={type === option.value}
               className={
-                "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 " +
+                "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
                 (type === option.value
                   ? "border-[#c9a24b]/70 bg-[#c9a24b]/15 text-gold-deep"
                   : "border-gold/30 bg-white/60 text-ink/60 hover:border-gold/60 hover:text-ink")

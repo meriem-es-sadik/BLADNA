@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "../i18n/LanguageContext";
+import { goldCtaClass, goldCtaIconClass } from "../utils/ctaStyles";
 
 export default function HeroCard() {
   const { t } = useI18n();
@@ -28,13 +29,10 @@ export default function HeroCard() {
 
       <Link
         to="/destinations"
-        className="group mt-7 inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-3.5 text-sm font-semibold tracking-wide text-morocco-deep shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-xl sm:mt-8 active:translate-y-0 active:scale-100"
+        className={`${goldCtaClass} mt-7 gap-2.5 px-7 py-3.5 text-sm sm:mt-8`}
       >
         {t("home.cta")}
-        <ArrowRight
-          className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1"
-          aria-hidden="true"
-        />
+        <ArrowRight className={goldCtaIconClass} aria-hidden="true" />
       </Link>
     </section>
   );

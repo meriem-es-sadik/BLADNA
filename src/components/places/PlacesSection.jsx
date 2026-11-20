@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RotateCcw, Search } from "lucide-react";
 import PlaceCard from "./PlaceCard";
 import PlaceDetails from "./PlaceDetails";
+import SectionIntro from "../SectionIntro";
 import {
   getFallbackPlaces,
   getPlaces,
@@ -12,6 +13,23 @@ import {
 import { useI18n } from "../../i18n/LanguageContext";
 
 const PAGE_SIZE = 9;
+
+const LANDMARK_TYPES = new Set([
+  "Museum",
+  "Historic castle",
+  "Historic fort",
+  "Monument",
+  "Memorial",
+  "Archaeological site",
+  "Historic ruins",
+  "Historic site",
+  "Historic building",
+  "Religious site",
+  "Historic gate",
+  "Landmark",
+  "Public artwork",
+  "Attraction",
+]);
 
 function SkeletonCard() {
   return (
@@ -27,10 +45,23 @@ function SkeletonCard() {
   );
 }
 
-export default function PlacesSection({ city, kind }) {
+export default function PlacesSection({
+  city,
+  kind,
+  group = "all",
+  kicker,
+  heading,
+  blurb,
+  showHeader = true,
+}) {
   const { t } = useI18n();
   const isRestaurant = kind === "restaurant";
-  const nounPlural = isRestaurant ? t("places.nounRestaurants") : t("places.nounActivities");
+  const isLandmarks = group === "landmarks";
+  const nounPlural = isRestaurant
+    ? t("places.nounRestaurants")
+    : isLandmarks
+      ? t("places.nounAttractions")
+      : t("places.nounActivities");
   const [places, setPlaces] = useState(() => getFallbackPlaces(city, kind));
   const [status, setStatus] = useState(places.length ? "ready" : "loading");
   const [liveStatus, setLiveStatus] = useState("loading");
@@ -40,6 +71,7 @@ export default function PlacesSection({ city, kind }) {
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState(null);
   const [reloadToken, setReloadToken] = useState(0);
+  const [forceLive, setForceLive] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,7 +85,7 @@ export default function PlacesSection({ city, kind }) {
     setVisible(PAGE_SIZE);
     setSelected(null);
 
-    getPlaces(city, kind)
+    getPlaces(city, kind, { force: forceLive })
       .then((live) => {
         if (cancelled) return;
         const merged = mergePlaces(fallback, live, kind, city);
@@ -70,20 +102,39 @@ export default function PlacesSection({ city, kind }) {
     return () => {
       cancelled = true;
     };
-  }, [city, kind, reloadToken]);
+  }, [city, kind, reloadToken, forceLive]);
+
+  const groupedPlaces = useMemo(() => {
+    if (isRestaurant || group === "all") return places;
+    return places.filter((place) =>
+      group === "landmarks"
+        ? LANDMARK_TYPES.has(place.typeLabel)
+        : !LANDMARK_TYPES.has(place.typeLabel)
+    );
+  }, [places, isRestaurant, group]);
 
   const filtered = useMemo(() => {
-    let list = places;
+    let list = groupedPlaces;
     const q = normalizeText(query);
     if (q) list = list.filter((place) => place.searchText.includes(q));
     if (type !== null) list = list.filter((place) => place.typeLabel === type);
     return sortPlaces(list, sort);
-  }, [places, query, type, sort]);
+  }, [groupedPlaces, query, type, sort]);
 
   const availableTypes = useMemo(
-    () => [...new Set(places.map((place) => place.typeLabel))].sort((a, b) => a.localeCompare(b)),
-    [places]
+    () =>
+      [...new Set(groupedPlaces.map((place) => place.typeLabel))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+    [groupedPlaces]
   );
+  const groupEmpty = groupedPlaces.length === 0;
+  const headingText =
+    heading ||
+    `${isRestaurant ? t("places.whereToEat") : t("places.thingsToDo")} ${t("places.in")} ${city.name}`;
+  const introText =
+    blurb || (isRestaurant ? t("places.restaurantBlurb") : t("places.activityBlurb"));
+  const kickerText = kicker || t("places.verifiedBy");
 
   const reset = () => {
     setQuery("");
@@ -92,16 +143,21 @@ export default function PlacesSection({ city, kind }) {
     setVisible(PAGE_SIZE);
   };
 
+  const retryLive = () => {
+    setForceLive(true);
+    setReloadToken((token) => token + 1);
+  };
+
   if (status === "error") {
     return (
       <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
-        <h2 className="font-display text-2xl font-medium text-ink">{t("places.errorTitle")}</h2>
+        <h2 className="font-display text-2xl font-medium text-ink">{t("places.emptyTitle", { noun: nounPlural, city: city.name })}</h2>
         <p className="mt-2 text-sm text-ink/60">
           {t("places.errorBody", { noun: nounPlural, city: city.name })}
         </p>
         <button
           type="button"
-          onClick={() => setReloadToken((token) => token + 1)}
+          onClick={retryLive}
           className="mt-5 rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-6 py-2.5 text-sm font-semibold text-[#3d270e] shadow transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
         >
           {t("common.tryAgain")}
@@ -112,7 +168,10 @@ export default function PlacesSection({ city, kind }) {
 
   if (status === "loading") {
     return (
-      <div className="w-full">
+      <div className="w-full" aria-busy="true">
+        {showHeader ? (
+          <SectionIntro kicker={kickerText} title={headingText} intro={introText} className="mb-8" />
+        ) : null}
         <div className="mb-6 flex justify-center">
           <div className="h-10 w-64 animate-pulse rounded-full border border-gold/25 bg-white/50" />
         </div>
@@ -127,18 +186,23 @@ export default function PlacesSection({ city, kind }) {
 
   if (status === "empty") {
     return (
-      <div className="w-full rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
-        <h2 className="font-display text-2xl font-medium text-ink">
-          {t("places.emptyTitle", { noun: nounPlural, city: city.name })}
-        </h2>
-        <p className="mt-2 text-sm text-ink/60">{t("places.emptyBody")}</p>
-        <button
-          type="button"
-          onClick={() => setReloadToken((token) => token + 1)}
-          className="mt-5 rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-        >
-          {t("common.tryAgain")}
-        </button>
+      <div className="w-full">
+        {showHeader ? (
+          <SectionIntro kicker={kickerText} title={headingText} intro={introText} className="mb-8" />
+        ) : null}
+        <div className="rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
+          <h2 className="font-display text-2xl font-medium text-ink">
+            {t("places.emptyTitle", { noun: nounPlural, city: city.name })}
+          </h2>
+          <p className="mt-2 text-sm text-ink/60">{t("places.emptyBody")}</p>
+          <button
+            type="button"
+            onClick={retryLive}
+            className="mt-5 rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+          >
+            {t("common.tryAgain")}
+          </button>
+        </div>
       </div>
     );
   }
@@ -149,21 +213,16 @@ export default function PlacesSection({ city, kind }) {
 
   return (
     <div className="w-full">
-      <div className="mb-6 text-center">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gold-deep">
-          {t("places.verifiedBy")}
-        </p>
-        <h2 className="mt-2 font-display text-2xl font-medium text-ink sm:text-[1.75rem]">
-          {isRestaurant ? t("places.whereToEat") : t("places.thingsToDo")}{" "}
-          {t("places.in")}{" "}
-          <span className="italic text-terra">{city.name}</span>
-        </h2>
-        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-ink/60">
-          {isRestaurant ? t("places.restaurantBlurb") : t("places.activityBlurb")}
-        </p>
-      </div>
+      {showHeader ? (
+        <SectionIntro
+          kicker={kickerText}
+          title={headingText}
+          intro={introText}
+          className="mb-8"
+        />
+      ) : null}
 
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-6 flex flex-col gap-3 rounded-[1.35rem] border border-gold/25 bg-white/55 p-3 shadow-[0_14px_34px_-28px_rgba(63,42,18,0.45)] backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-4">
         <label className="relative block w-full sm:max-w-xs">
           <span className="sr-only">
             {t("places.searchLabel", { noun: nounPlural })}
@@ -245,11 +304,11 @@ export default function PlacesSection({ city, kind }) {
       {liveStatus === "offline" && (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/35 bg-[#f6ecd8]/70 px-4 py-3 text-start">
           <p className="text-xs leading-relaxed text-ink/65">
-            {t("places.offline", { count: places.length, noun: nounPlural })}
+            {t("places.offline", { count: groupedPlaces.length, noun: nounPlural })}
           </p>
           <button
             type="button"
-            onClick={() => setReloadToken((token) => token + 1)}
+            onClick={retryLive}
             className="rounded-full border border-gold/50 px-4 py-1.5 text-xs font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
           >
             {t("places.retryLive")}
@@ -257,7 +316,31 @@ export default function PlacesSection({ city, kind }) {
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {groupEmpty ? (
+        <div className="rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
+          <h2 className="font-display text-xl font-medium text-ink">
+            {t("places.emptyTitle", { noun: nounPlural, city: city.name })}
+          </h2>
+          <p className="mt-2 text-sm text-ink/55">{t("places.emptyBody")}</p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            {group === "landmarks" || group === "experiences" ? (
+              <a
+                href={group === "landmarks" ? "#activities" : "#attractions"}
+                className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+              >
+                {t(group === "landmarks" ? "city.activities" : "city.attractions")}
+              </a>
+            ) : null}
+            <button
+              type="button"
+              onClick={retryLive}
+              className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+            >
+              {t("common.tryAgain")}
+            </button>
+          </div>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="rounded-[1.5rem] border border-gold/30 bg-white/60 px-6 py-12 text-center">
           <h2 className="font-display text-xl font-medium text-ink">
             {t("places.noMatchTitle", { noun: nounPlural })}
@@ -286,8 +369,8 @@ export default function PlacesSection({ city, kind }) {
                 total: filtered.length,
                 noun: nounPlural,
               })}
-              {places.length !== filtered.length
-                ? t("places.showingFrom", { count: places.length })
+              {groupedPlaces.length !== filtered.length
+                ? t("places.showingFrom", { count: groupedPlaces.length })
                 : ""}
             </p>
             {visible < filtered.length && (

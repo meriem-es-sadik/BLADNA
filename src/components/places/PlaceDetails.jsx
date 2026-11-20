@@ -4,10 +4,13 @@ import HotelGallery from "../hotels/HotelGallery";
 import PlaceActions from "../PlaceActions";
 import { getPlacePhotos } from "../../services/hotelPhotosService";
 import { useI18n } from "../../i18n/LanguageContext";
+import { getLastCheckedAt, getSourceLabelKey } from "../../utils/dataProvenance";
 
 export default function PlaceDetails({ place, onClose }) {
   const { t } = useI18n();
   const Icon = place.kind === "restaurant" ? Utensils : Compass;
+  const sourceLabelKey = getSourceLabelKey(place);
+  const lastCheckedAt = getLastCheckedAt(place);
   const [images, setImages] = useState(place.images || []);
 
   useEffect(() => {
@@ -51,7 +54,7 @@ export default function PlaceDetails({ place, onClose }) {
               </p>
             </div>
             <span className="rounded-full border border-[#c9a24b]/60 bg-[#c9a24b]/15 px-3.5 py-1.5 text-xs font-bold text-gold-deep">
-              {t("common.verified")}
+              {t(sourceLabelKey)}
             </span>
           </div>
 
@@ -113,11 +116,10 @@ export default function PlaceDetails({ place, onClose }) {
           )}
 
           <p className="mt-4 text-[11px] leading-relaxed text-ink/45">
-            {t("places.detailsSource", {
-              verified: place.verifiedAt
-                ? t("places.verifiedOn", { date: place.verifiedAt })
-                : "",
-            })}
+            {t("places.detailsSource")}
+            {lastCheckedAt
+              ? ` ${t("common.lastChecked", { date: lastCheckedAt })}`
+              : ""}
           </p>
         </div>
       </div>

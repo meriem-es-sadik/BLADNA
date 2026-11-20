@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 import { getFallbackPhoto, getPrimaryPhoto } from "../../services/hotelPhotosService";
 import { useI18n } from "../../i18n/LanguageContext";
+import { getSourceLabelKey } from "../../utils/dataProvenance";
 import { buildOsmUrl } from "../../utils/links";
 import PlaceActions from "../PlaceActions";
 
@@ -17,6 +18,7 @@ function photoFromPlace(place) {
 
 export default function PlaceCard({ place, onDetails }) {
   const { t } = useI18n();
+  const sourceLabelKey = getSourceLabelKey(place);
   const [photo, setPhoto] = useState(() => photoFromPlace(place));
   const [loading, setLoading] = useState(!place.image);
   const failedRef = useRef(false);
@@ -91,7 +93,7 @@ export default function PlaceCard({ place, onDetails }) {
         )}
 
         <span className="absolute start-3 top-3 rounded-full border border-gold/35 bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-deep backdrop-blur-sm">
-          {t("common.verified")}
+          {t(sourceLabelKey)}
         </span>
 
         {isIllustrative ? (

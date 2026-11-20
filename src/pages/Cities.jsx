@@ -1,29 +1,24 @@
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, X, ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 import SiteNav from "../components/SiteNav";
-import { citiesByRegion } from "../data/cities";
-import { regionName } from "../data/regions";
+import { cities } from "../data/cities";
 import { useI18n } from "../i18n/LanguageContext";
 
 const CITY_STORAGE_KEY = "bladna-selected-city";
 
 export default function Cities() {
   const navigate = useNavigate();
-  const { hash } = useLocation();
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
 
-  useEffect(() => {
-    if (!hash) return;
-    const target = document.getElementById(hash.slice(1));
-    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [hash]);
+  const [selectedCity, setSelectedCity] = useState(null);
 
   const selectCity = (city) => {
     sessionStorage.setItem(
       CITY_STORAGE_KEY,
       JSON.stringify({ name: city.name, slug: city.slug })
     );
+    setSelectedCity(city);
     navigate(`/cities/${city.slug}`);
   };
 
@@ -62,14 +57,10 @@ export default function Cities() {
         />
       </div>
 
-      <SiteNav />
+      <SiteNav hideSearch={true} />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-10 pt-4 sm:px-6 lg:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-6 pt-4 sm:px-6 lg:px-10">
         <section className="flex shrink-0 flex-col items-center text-center">
-          <span className="mt-2 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/70 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold-deep">
-            <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
-            {t("cities.regionsCovered")}
-          </span>
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
             {t("cities.titleA")} <span className="italic text-terra">{t("cities.titleB")}</span>
           </h1>
@@ -78,45 +69,34 @@ export default function Cities() {
           </p>
         </section>
 
-        <section aria-label={t("cities.listAria")} className="mt-4 flex flex-col">
-          {citiesByRegion.map((region) => (
-            <section
-              key={region.id}
-              id={`region-${region.id}`}
-              className="scroll-mt-28 pt-6 first:pt-2"
-            >
-              <div className="flex items-center gap-3">
-                <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
-                  {regionName(region, lang)}
-                </h2>
-                <span className="shrink-0 rounded-full border border-gold/35 bg-white/70 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-gold-deep">
-                  {t("cities.citiesCount", { count: region.cities.length })}
-                </span>
-                <span className="h-px flex-1 bg-gold/25" aria-hidden="true" />
-              </div>
-
-              <ul className="mt-3 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {region.cities.map((city) => (
-                  <li key={city.slug} className="min-h-[64px]">
-                    <button
-                      type="button"
-                      onClick={() => selectCity(city)}
-                      aria-label={t("cities.select", { city: city.name })}
-                      className="group flex h-full min-h-[64px] w-full items-center justify-between gap-3 rounded-[1.1rem] border border-gold/40 bg-[#fbf6ea] px-5 text-start shadow-[0_10px_28px_-16px_rgba(63,42,18,0.4)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-gold/80 hover:bg-[#f6ecd8] hover:shadow-[0_16px_34px_-16px_rgba(63,42,18,0.45)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep active:translate-y-0"
-                    >
-                      <span className="font-display text-base font-semibold text-ink sm:text-lg">
-                        {city.name}
-                      </span>
-                      <ArrowUpRight
-                        className="h-4 w-4 shrink-0 text-gold-deep transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:rotate-[-90deg] rtl:group-hover:-translate-x-0.5"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+        <section aria-label={t("cities.listAria")} className="flex flex-1 items-center justify-center">
+          <ul className="grid w-full grid-cols-1 gap-4 py-6 sm:grid-cols-2 lg:grid-cols-3">
+            {cities.map((city) => {
+              const isSelected = selectedCity?.slug === city.slug;
+              return (
+                <li key={city.slug}>
+                  <button
+                    type="button"
+                    onClick={() => selectCity(city)}
+                    aria-label={t("cities.select", { city: city.name })}
+                    className={`group flex h-[72px] w-full items-center justify-between rounded-[1.25rem] border border-gold/40 bg-[#fbf6ea] px-6 text-start shadow-[0_10px_28px_-16px_rgba(63,42,18,0.4)] transition-all duration-300 ease-out ${
+                      isSelected
+                        ? "opacity-90"
+                        : "hover:-translate-y-0.5 hover:border-gold/80 hover:bg-[#f6ecd8] hover:shadow-[0_16px_34px_-16px_rgba(63,42,18,0.45)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep active:translate-y-0"
+                    }`}
+                  >
+                    <span className="font-display text-lg font-semibold text-ink">
+                      {city.name}
+                    </span>
+                    <ArrowUpRight
+                      className="h-4 w-4 shrink-0 text-gold-deep transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:rotate-[-90deg] rtl:group-hover:-translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       </div>
     </div>
