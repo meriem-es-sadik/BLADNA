@@ -59,7 +59,7 @@ export default function Cities() {
 
       <SiteNav hideSearch={true} />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-6 pt-4 sm:px-6 lg:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-6 pt-20 sm:px-6 sm:pt-24 lg:px-10">
         <section className="flex shrink-0 flex-col items-center text-center">
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
             {t("cities.titleA")} <span className="italic text-terra">{t("cities.titleB")}</span>

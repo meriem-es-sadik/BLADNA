@@ -6,7 +6,7 @@ import { useI18n } from "../i18n/LanguageContext";
 import { useContact } from "../context/ContactContext";
 
 const CONTACT_EMAIL = "contact@bladna.ma";
-const INSTAGRAM_URL = "https://www.instagram.com/bladna01/";
+const INSTAGRAM_URL = "https://www.instagram.com/bladna.mad";
 
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -144,26 +144,26 @@ export default function SiteFooter() {
                     <p className="mt-1 text-sm font-medium text-[#f8f3e6] break-all">{CONTACT_EMAIL}</p>
                     <p className="mt-1 text-xs text-white/60">{t("contact.emailHint")}</p>
                   </div>
-                </a>
+                  </a>
 
-                <a
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t("footer.instagramAria")}
-                  className="group flex items-start gap-4 rounded-[1.2rem] border border-gold/25 bg-white/5 p-4 transition hover:border-gold/45 hover:bg-white/8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
-                >
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-[#d3a24b]/15 text-[#d3a24b]">
-                    <Instagram className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d3a24b]">
-                      {t("contact.socialLabel")}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-[#f8f3e6]">{t("footer.instagram")}</p>
-                    <p className="mt-1 text-xs text-white/60">{t("contact.socialHint")}</p>
-                  </div>
-                </a>
+                  <a
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={t("footer.instagramAria")}
+                    className="flex items-start gap-4 rounded-[1.2rem] border border-gold/25 bg-white/5 p-4 transition hover:border-gold/45 hover:bg-white/8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+                  >
+                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-[#d3a24b]/15 text-[#d3a24b]">
+                      <Instagram className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d3a24b]">
+                        {t("footer.instagram")}
+                      </p>
+                      <p className="mt-1 text-xs text-white/60">@bladna.mad</p>
+                    </div>
+                  </a>
+
               </div>
 
               <div
@@ -305,22 +305,23 @@ export default function SiteFooter() {
             {t("footer.aboutText")}
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t("footer.instagramAria")}
-              className="inline-flex items-center gap-2 rounded-full border border-[#d3a24b]/55 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:border-[#d3a24b] hover:text-[#d3a24b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d3a24b]"
-            >
-              <Instagram className="h-4 w-4 text-[#d3a24b]" aria-hidden="true" />
-              {t("footer.instagram")}
-            </a>
+
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-semibold text-white/85 transition hover:border-[#d3a24b] hover:text-[#d3a24b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d3a24b]"
             >
               <Mail className="h-4 w-4" aria-hidden="true" />
               {t("contact.emailUs")}
+            </a>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t("footer.instagramAria")}
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-semibold text-white/85 transition hover:border-[#d3a24b] hover:text-[#d3a24b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d3a24b]"
+            >
+              <Instagram className="h-4 w-4" aria-hidden="true" />
+              {t("footer.instagram")}
             </a>
           </div>
         </div>
@@ -353,7 +354,8 @@ export default function SiteFooter() {
                 href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 transition hover:text-[#d3a24b]"
+                aria-label={t("footer.instagramAria")}
+                className="inline-flex items-center gap-2 transition hover:text-[#d3a24b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d3a24b]"
               >
                 <Instagram className="h-4 w-4 text-[#d3a24b]" aria-hidden="true" />
                 {t("footer.instagram")}

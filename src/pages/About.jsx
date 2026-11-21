@@ -29,9 +29,7 @@ export default function About() {
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
       <ZelligeEdges />
 
-      <div className="absolute inset-x-0 top-0 z-40">
-        <SiteNav transparent hideSearch />
-      </div>
+      <SiteNav transparent hideSearch />
 
       <main className="relative z-10 flex-1">
         <section className="relative isolate flex min-h-[70vh] w-full items-end overflow-hidden bg-[#1b1208] sm:min-h-[78vh]">

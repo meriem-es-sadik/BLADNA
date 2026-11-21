@@ -8,8 +8,10 @@ const cache = new Map();
 const inflight = new Map();
 
 const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
 ];
 
 const CUISINE_LABELS = {
@@ -50,12 +52,15 @@ const ACTIVITY_LABELS = {
   ruins: "Historic ruins",
   yes: "Historic site",
   building: "Historic building",
+  tomb: "Historic tomb",
   place_of_worship: "Religious site",
   park: "Park",
   garden: "Garden",
   nature_reserve: "Nature reserve",
   beach: "Beach",
   spring: "Natural spring",
+  waterfall: "Waterfall",
+  square: "Public square",
   cape: "Scenic cape",
   peak: "Mountain peak",
   theatre: "Theatre",
@@ -68,6 +73,65 @@ const ACTIVITY_LABELS = {
   tower: "Landmark",
   garden_site: "Garden",
 };
+
+const LANDMARK_TAGS = new Set([
+  "museum",
+  "attraction",
+  "monument",
+  "memorial",
+  "archaeological_site",
+  "ruins",
+  "historic",
+  "building",
+  "yes",
+  "tomb",
+  "castle",
+  "fort",
+  "city_gate",
+  "tower",
+  "place_of_worship",
+  "artwork",
+  "monument_site",
+  "university",
+]);
+
+const EXPERIENCE_TAGS = new Set([
+  "viewpoint",
+  "zoo",
+  "theme_park",
+  "park",
+  "garden",
+  "garden_site",
+  "nature_reserve",
+  "beach",
+  "spring",
+  "waterfall",
+  "square",
+  "cape",
+  "peak",
+  "theatre",
+  "arts_centre",
+  "marina",
+  "gallery",
+]);
+
+const LANDMARK_LABELS = new Set([
+  "Museum",
+  "Historic castle",
+  "Historic fort",
+  "Monument",
+  "Memorial",
+  "Archaeological site",
+  "Historic ruins",
+  "Historic site",
+  "Historic building",
+  "Historic tomb",
+  "Religious site",
+  "Historic gate",
+  "Landmark",
+  "Public artwork",
+  "Attraction",
+]);
 
 function humanize(value) {
   const cleaned = String(value || "")
@@ -97,6 +161,25 @@ function activityLabel(record) {
     if (ACTIVITY_LABELS[key]) return ACTIVITY_LABELS[key];
   }
   return record.type ? humanize(record.type) : "Place of interest";
+}
+
+export function activityGroup(record) {
+  const values = [
+    record.tourism,
+    record.historic,
+    record.leisure,
+    record.natural,
+    record.amenity,
+    record.osmCategory,
+    record.type,
+  ];
+  for (const value of values) {
+    if (!value) continue;
+    const key = String(value).toLowerCase();
+    if (LANDMARK_TAGS.has(key)) return "landmarks";
+    if (EXPERIENCE_TAGS.has(key)) return "experiences";
+  }
+  return LANDMARK_LABELS.has(activityLabel(record)) ? "landmarks" : "experiences";
 }
 
 export function normalizeText(value) {
@@ -141,9 +224,8 @@ export function formatPlace(record, kind, city) {
   const location = record.area || record.address || city.name;
   const noun = kind === "restaurant" ? "restaurant" : "place to visit";
   const description =
-    kind === "restaurant"
-      ? `${typeLabel} in ${city.name}${record.area ? `, ${record.area}` : ""}.`
-      : `${typeLabel} in ${city.name}${record.area ? `, ${record.area}` : ""}.`;
+    record.description ||
+    `${typeLabel} in ${city.name}${record.area ? `, ${record.area}` : ""}.`;
 
   const images = [];
   const seen = new Set();
@@ -178,6 +260,7 @@ export function formatPlace(record, kind, city) {
     citySlug: city.slug,
     name: record.name,
     typeLabel,
+    activityGroup: kind === "restaurant" ? null : activityGroup(record),
     description,
     address: record.address || null,
     area: record.area || null,
@@ -227,12 +310,22 @@ export function getFallbackPlaces(city, kind) {
 
 export function mergePlaces(fallback, live, kind, city) {
   const seen = new Set(fallback.map((place) => normalizeText(place.name)));
+  const seenIds = new Set(fallback.map((place) => place.id));
   const unique = [];
   for (const record of live) {
     const place = formatPlace(record, kind, city);
     const key = normalizeText(place.name);
-    if (!key || seen.has(key) || !Number.isFinite(place.lat) || !Number.isFinite(place.lon)) continue;
+    if (
+      !key ||
+      seen.has(key) ||
+      seenIds.has(place.id) ||
+      !Number.isFinite(place.lat) ||
+      !Number.isFinite(place.lon)
+    ) {
+      continue;
+    }
     seen.add(key);
+    seenIds.add(place.id);
     unique.push(place);
   }
   return [...fallback, ...unique];
@@ -268,11 +361,15 @@ async function requestOverpass(query) {
   let lastError;
   for (const endpoint of OVERPASS_ENDPOINTS) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12000);
+    const timer = setTimeout(() => controller.abort(), 25000);
     try {
-      const response = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, {
-        method: "GET",
-        headers: { Accept: "application/json" },
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        body: `data=${encodeURIComponent(query)}`,
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(`Overpass ${response.status}`);

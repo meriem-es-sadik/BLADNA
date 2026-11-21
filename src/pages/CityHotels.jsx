@@ -4,6 +4,7 @@ import { cities } from "../data/cities";
 import { getCityName } from "../data/cityNames";
 import HotelsSection from "../components/hotels/HotelsSection";
 import SiteNav from "../components/SiteNav";
+import ZelligeEdges from "../components/ZelligeEdges";
 import { useI18n } from "../i18n/LanguageContext";
 
 export default function CityHotels() {
@@ -22,6 +23,8 @@ export default function CityHotels() {
 
   return (
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
+      <ZelligeEdges />
+
       <SiteNav
         backTo={`/cities/${slug}`}
         backLabel={t("city.backToCity", { city: cityName })}
@@ -30,7 +33,7 @@ export default function CityHotels() {
         onCategoryChange={(id) => navigate(`/cities/${slug}/${id}`)}
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-8 sm:px-6 sm:pt-10 lg:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-20 sm:px-6 sm:pt-24 lg:px-10">
         <section id="hotels" className="scroll-mt-44">
           <HotelsSection
             city={city}

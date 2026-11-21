@@ -1,52 +1,114 @@
+const CORNERS = [
+  {
+    src: "/img/zliij.png",
+    position: "-start-24 -top-20 sm:-start-32 sm:-top-28",
+    size: "w-[260px] sm:w-[360px] lg:w-[420px]",
+    opacity: "opacity-60",
+    blend: "mix-blend-multiply",
+    mask: "radial-gradient(circle at 24% 24%, black 38%, transparent 68%)",
+  },
+  {
+    src: "/img/zliij-removebg-preview.png",
+    position: "-end-20 top-[16%]",
+    size: "w-[200px] sm:w-[280px] lg:w-[320px]",
+    opacity: "opacity-55",
+    blend: "",
+    mask: "radial-gradient(circle at 78% 45%, black 36%, transparent 66%)",
+  },
+  {
+    src: "/img/zliij-removebg-preview.png",
+    position: "-start-20 bottom-[20%]",
+    size: "w-[190px] sm:w-[250px]",
+    opacity: "opacity-50",
+    blend: "",
+    mask: "radial-gradient(circle at 28% 62%, black 36%, transparent 66%)",
+  },
+  {
+    src: "/img/zliij.png",
+    position: "-bottom-20 -end-24 sm:-bottom-28 sm:-end-32",
+    size: "w-[260px] sm:w-[360px] lg:w-[420px]",
+    opacity: "opacity-60",
+    blend: "mix-blend-multiply",
+    mask: "radial-gradient(circle at 72% 74%, black 38%, transparent 68%)",
+  },
+];
+
 export default function ZelligeEdges() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-clip select-none">
-      <img
-        src="/img/zliij.png"
-        alt=""
-        loading="eager"
-        decoding="async"
-        className="absolute -start-28 -top-24 w-[220px] opacity-35 mix-blend-multiply sm:-start-36 sm:-top-28 sm:w-[300px] lg:w-[360px]"
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+      <div
+        className="absolute inset-0 opacity-[0.07] mix-blend-multiply"
         style={{
-          maskImage: "radial-gradient(circle at 22% 22%, black 28%, transparent 58%)",
-          WebkitMaskImage: "radial-gradient(circle at 22% 22%, black 28%, transparent 58%)",
+          backgroundImage: 'url("/img/zliij.png")',
+          backgroundRepeat: "repeat",
+          backgroundSize: "240px 240px",
+          maskImage: "radial-gradient(ellipse at center, transparent 32%, black 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, transparent 32%, black 100%)",
         }}
       />
-      <img
-        src="/img/zliij.png"
-        alt=""
-        loading="lazy"
-        decoding="async"
-        className="absolute -end-24 top-[18%] hidden w-[190px] opacity-28 mix-blend-multiply md:block lg:w-[250px]"
+
+      <div
+        className="absolute inset-y-0 start-0 hidden w-14 opacity-45 mix-blend-multiply sm:block lg:w-20"
         style={{
-          maskImage: "radial-gradient(circle at 78% 50%, black 24%, transparent 56%)",
-          WebkitMaskImage: "radial-gradient(circle at 78% 50%, black 24%, transparent 56%)",
+          backgroundImage: 'url("/img/zliij.png")',
+          backgroundRepeat: "repeat-y",
+          backgroundSize: "auto 190px",
+          backgroundPosition: "left center",
+          maskImage: "linear-gradient(to right, black, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, black, transparent)",
         }}
       />
-      <img
-        src="/img/zliij.png"
-        alt=""
-        loading="lazy"
-        decoding="async"
-        className="absolute -start-20 bottom-[22%] hidden w-[170px] opacity-22 mix-blend-multiply lg:block"
+      <div
+        className="absolute inset-y-0 end-0 hidden w-14 opacity-45 mix-blend-multiply sm:block lg:w-20"
         style={{
-          maskImage: "radial-gradient(circle at 30% 60%, black 24%, transparent 56%)",
-          WebkitMaskImage: "radial-gradient(circle at 30% 60%, black 24%, transparent 56%)",
+          backgroundImage: 'url("/img/zliij.png")',
+          backgroundRepeat: "repeat-y",
+          backgroundSize: "auto 190px",
+          backgroundPosition: "right center",
+          maskImage: "linear-gradient(to left, black, transparent)",
+          WebkitMaskImage: "linear-gradient(to left, black, transparent)",
         }}
       />
-      <img
-        src="/img/zliij.png"
-        alt=""
-        loading="lazy"
-        decoding="async"
-        className="absolute -bottom-24 -end-28 w-[220px] opacity-30 mix-blend-multiply sm:-bottom-28 sm:-end-36 sm:w-[300px] lg:w-[360px]"
+
+      {CORNERS.map((corner, index) => (
+        <img
+          key={index}
+          src={corner.src}
+          alt=""
+          loading={index === 0 ? "eager" : "lazy"}
+          decoding="async"
+          className={`absolute ${corner.position} ${corner.size} ${corner.opacity} ${corner.blend}`}
+          style={{
+            maskImage: corner.mask,
+            WebkitMaskImage: corner.mask,
+          }}
+        />
+      ))}
+
+      <div className="absolute inset-y-0 start-0 hidden w-px bg-linear-to-b from-transparent via-gold/45 to-transparent sm:block" />
+      <div className="absolute inset-y-0 end-0 hidden w-px bg-linear-to-b from-transparent via-gold/45 to-transparent sm:block" />
+    </div>
+  );
+}
+
+export function ZelligeDivider({ className = "" }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none relative z-10 flex h-10 w-full items-center justify-center overflow-hidden ${className}`}
+    >
+      <div className="absolute inset-x-0 top-1/2 h-px bg-linear-to-r from-transparent via-gold/50 to-transparent" />
+      <div
+        className="absolute inset-x-0 top-1/2 h-8 -translate-y-1/2 opacity-70"
         style={{
-          maskImage: "radial-gradient(circle at 72% 72%, black 28%, transparent 58%)",
-          WebkitMaskImage: "radial-gradient(circle at 72% 72%, black 28%, transparent 58%)",
+          backgroundImage: 'url("/img/zliij-removebg-preview.png")',
+          backgroundRepeat: "repeat-x",
+          backgroundSize: "auto 100%",
+          backgroundPosition: "center",
+          maskImage: "linear-gradient(to right, transparent, black 18%, black 82%, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 18%, black 82%, transparent)",
         }}
       />
-      <div className="absolute inset-y-0 start-0 hidden w-px bg-linear-to-b from-transparent via-gold/20 to-transparent sm:block" />
-      <div className="absolute inset-y-0 end-0 hidden w-px bg-linear-to-b from-transparent via-gold/20 to-transparent sm:block" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { ArrowLeft, BedDouble, Compass, Menu, Search, Utensils, X } from "lucide-react";
 import BrandLogo from "./BrandLogo";
@@ -39,7 +39,15 @@ export default function SiteNav({
   const { openContact } = useContact();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const hasCategories = typeof onCategoryChange === "function";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const links = [
     { to: "/", label: t("nav.home"), end: true },
@@ -60,12 +68,15 @@ export default function SiteNav({
   ];
 
   const headerBg = transparent
-    ? "bg-linear-to-b from-[#120b04]/70 via-[#120b04]/25 to-transparent backdrop-blur-[2px]"
-    : "sticky top-0 z-40 shrink-0 border-b border-gold/30 bg-ivory/95 backdrop-blur-md";
+    ? scrolled
+      ? "border-b border-gold/25 bg-[#14110d]/95 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.9)] backdrop-blur-md"
+      : "border-b border-transparent bg-linear-to-b from-[#120b04]/75 via-[#120b04]/30 to-transparent backdrop-blur-[2px]"
+    : "border-b border-gold/30 bg-ivory/95 shadow-[0_10px_30px_-22px_rgba(63,42,18,0.55)] backdrop-blur-md";
 
   return (
     <>
-      <header className={headerBg + (transparent ? " relative z-40" : "")}>
+      <div className="fixed inset-x-0 top-0 z-50 w-full">
+      <header className={headerBg}>
         <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6 lg:px-10">
           {backTo ? (
             <Link
@@ -173,7 +184,7 @@ export default function SiteNav({
             id="site-nav-menu"
             className={
               "border-t px-4 py-3 md:hidden " +
-              (transparent ? "border-white/15 bg-[#120b04]/90 backdrop-blur-md" : "border-gold/25 bg-ivory/98")
+              (transparent ? "border-white/15 bg-[#14110d]/98 backdrop-blur-md" : "border-gold/25 bg-ivory/98")
             }
           >
             <nav aria-label={t("nav.mobile")} className="flex flex-col gap-1">
@@ -229,7 +240,7 @@ export default function SiteNav({
       </header>
 
       {!hideSearch && !transparent && (
-        <div className="border-t border-gold/20 bg-ivory/80">
+        <div className="border-t border-gold/20 bg-ivory/95 backdrop-blur-md">
           <div className="mx-auto w-full max-w-7xl px-4 py-2 sm:px-6 lg:px-10">
             <button
               type="button"
@@ -247,6 +258,7 @@ export default function SiteNav({
           </div>
         </div>
       )}
+      </div>
 
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>

@@ -6,17 +6,13 @@ import {
   Building2,
   Camera,
   Compass,
-  Heart,
   Landmark,
   MapPin,
-  Music,
-  Palette,
   Sparkles,
-  Users,
   Utensils,
 } from "lucide-react";
 import SiteNav from "../components/SiteNav";
-import ZelligeEdges from "../components/ZelligeEdges";
+import ZelligeEdges, { ZelligeDivider } from "../components/ZelligeEdges";
 import HotelsSection from "../components/hotels/HotelsSection";
 import PlacesSection from "../components/places/PlacesSection";
 import SectionIntro from "../components/SectionIntro";
@@ -137,15 +133,6 @@ function CityHero({ city, guide, cityName, story, t }) {
   );
 }
 
-const CULTURE_FACETS = [
-  { key: "identity", icon: Heart },
-  { key: "traditions", icon: Users },
-  { key: "crafts", icon: Palette },
-  { key: "cuisine", icon: Utensils },
-  { key: "festivals", icon: Music },
-  { key: "architecture", icon: Building2 },
-];
-
 export default function CityPage() {
   const { slug } = useParams();
   const { t, lang } = useI18n();
@@ -191,28 +178,6 @@ export default function CityPage() {
     return items.slice(0, 4);
   }, [culture, guide?.tagline, history, knownFor, monuments, regionLabel, story.tagline, t]);
 
-  const experienceHighlights = useMemo(() => {
-    const items = [];
-    knownFor.slice(0, 2).forEach((item) => {
-      items.push({ title: item, text: t("city.knownFor"), icon: Sparkles, href: "#attractions" });
-    });
-    monuments.slice(0, 2).forEach((item) => {
-      if (items.length < 4) items.push({ title: item, text: t("city.heritage"), icon: Landmark, href: "#attractions" });
-    });
-    CULTURE_FACETS.forEach((facet) => {
-      if (items.length >= 4) return;
-      if (culture[facet.key]) {
-        items.push({
-          title: t(`city.${facet.key}`),
-          text: culture[facet.key],
-          icon: facet.icon,
-          href: "#discover",
-        });
-      }
-    });
-    return items.slice(0, 4);
-  }, [culture, knownFor, monuments, t]);
-
   const secondaryNav = [
     { id: "hotels", label: t("nav.hotels"), icon: BedDouble, href: "#hotels", to: `/cities/${city.slug}/hotels` },
     { id: "restaurants", label: t("nav.restaurants"), icon: Utensils, href: "#restaurants", to: `/cities/${city.slug}/restaurants` },
@@ -233,14 +198,12 @@ export default function CityPage() {
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
       <ZelligeEdges />
 
-      <div className="absolute inset-x-0 top-0 z-40">
-        <SiteNav transparent hideSearch backTo="/cities" backLabel={t("city.backToCities")} />
-      </div>
+      <SiteNav transparent hideSearch backTo="/cities" backLabel={t("city.backToCities")} />
 
       <main className="relative z-10 flex-1">
         <CityHero city={city} guide={guide} cityName={cityName} story={story} t={t} />
 
-        <section id="discover" className="scroll-mt-28 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+        <section id="discover" className="scroll-mt-36 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
           <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
             <div>
               <SectionIntro
@@ -284,7 +247,7 @@ export default function CityPage() {
           </div>
         </section>
 
-        {(history.length > 0 || monuments.length > 0 || experienceHighlights.length > 0) ? (
+        {(history.length > 0 || monuments.length > 0) ? (
           <section className="bg-[#f6ecd8]/30 px-4 py-14 sm:px-6 lg:px-10">
             <div className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[1.15fr_0.85fr]">
               <div>
@@ -339,9 +302,9 @@ export default function CityPage() {
 
         <nav
           aria-label={t("city.categoriesAria")}
-          className="sticky top-3 z-30 mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-10"
+          className="sticky top-[4.25rem] z-30 mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-10"
         >
-          <div className="flex flex-wrap items-center justify-center gap-2 rounded-[1.4rem] border border-gold/35 bg-white/80 p-2 shadow-[0_18px_40px_-24px_rgba(63,42,18,0.45)] ring-1 ring-gold/10 backdrop-blur-md">
+          <div className="flex flex-wrap items-center justify-center gap-2 rounded-[1.4rem] border border-gold/35 bg-ivory/95 p-2 shadow-[0_18px_40px_-24px_rgba(63,42,18,0.45)] ring-1 ring-gold/10 backdrop-blur-md">
             {secondaryNav.map((item) => {
               const Icon = item.icon;
               const active = activeCategory === item.id;
@@ -365,42 +328,10 @@ export default function CityPage() {
           </div>
         </nav>
 
-        {experienceHighlights.length ? (
-          <section id="experiences" className="scroll-mt-28 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
-            <div className="mx-auto w-full max-w-7xl">
-              <SectionIntro
-                kicker={t("city.activitiesKicker")}
-                title={t("city.featuredExperiences", { city: cityName })}
-                intro={t("city.featuredExperiencesIntro", { city: cityName })}
-                align="center"
-              />
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {experienceHighlights.map((item) => {
-                  const Icon = item.icon || Sparkles;
-                  return (
-                    <a
-                      key={item.title}
-                      href={item.href}
-                      className="group rounded-[1.35rem] border border-gold/30 bg-white/70 p-5 shadow-[0_16px_40px_-32px_rgba(63,42,18,0.45)] transition hover:-translate-y-0.5 hover:border-gold/60"
-                    >
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#f6ecd8] text-gold-deep">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                      <p className="mt-4 font-display text-lg font-medium text-ink">{item.title}</p>
-                      <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-ink/65">{item.text}</p>
-                      <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-gold-deep">
-                        {t("city.exploreCity")}
-                        <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" aria-hidden="true" />
-                      </span>
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        ) : null}
+        <ZelligeDivider />
 
-        <section id="attractions" className="scroll-mt-28 bg-[#f6ecd8]/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+
+        <section id="attractions" className="scroll-mt-36 bg-[#f6ecd8]/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
           <div className="mx-auto w-full max-w-7xl">
             <SectionIntro
               kicker={t("city.attractionsKicker")}
@@ -417,7 +348,7 @@ export default function CityPage() {
           </div>
         </section>
 
-        <section id="hotels" className="scroll-mt-28 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+        <section id="hotels" className="scroll-mt-36 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
           <div className="mx-auto w-full max-w-7xl">
             <SectionIntro
               kicker={t("city.hotelsKicker")}
@@ -438,7 +369,9 @@ export default function CityPage() {
           </div>
         </section>
 
-        <section id="restaurants" className="scroll-mt-28 bg-white/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+        <ZelligeDivider />
+
+        <section id="restaurants" className="scroll-mt-36 bg-white/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
           <div className="mx-auto w-full max-w-7xl">
             <SectionIntro
               kicker={t("city.restaurantsKicker")}
@@ -463,7 +396,9 @@ export default function CityPage() {
           </div>
         </section>
 
-        <section id="activities" className="scroll-mt-28 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+        <ZelligeDivider />
+
+        <section id="activities" className="scroll-mt-36 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
           <div className="mx-auto w-full max-w-7xl">
             <SectionIntro
               kicker={t("city.activitiesKicker")}
@@ -490,7 +425,7 @@ export default function CityPage() {
         </section>
 
         {mapHref ? (
-          <section id="map" className="scroll-mt-28 px-4 pb-16 pt-4 sm:px-6 lg:px-10">
+          <section id="map" className="scroll-mt-36 px-4 pb-16 pt-4 sm:px-6 lg:px-10">
             <div className="mx-auto w-full max-w-7xl overflow-hidden rounded-[1.75rem] border border-gold/30 bg-[#1b1208] text-ivory shadow-[0_24px_60px_-36px_rgba(27,18,8,0.8)]">
               <div className="grid items-center gap-6 p-8 sm:p-10 lg:grid-cols-[1.2fr_0.8fr]">
                 <div>

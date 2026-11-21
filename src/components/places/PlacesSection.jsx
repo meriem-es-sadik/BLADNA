@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RotateCcw, Search } from "lucide-react";
 import PlaceCard from "./PlaceCard";
 import PlaceDetails from "./PlaceDetails";
@@ -13,23 +13,6 @@ import {
 import { useI18n } from "../../i18n/LanguageContext";
 
 const PAGE_SIZE = 9;
-
-const LANDMARK_TYPES = new Set([
-  "Museum",
-  "Historic castle",
-  "Historic fort",
-  "Monument",
-  "Memorial",
-  "Archaeological site",
-  "Historic ruins",
-  "Historic site",
-  "Historic building",
-  "Religious site",
-  "Historic gate",
-  "Landmark",
-  "Public artwork",
-  "Attraction",
-]);
 
 function SkeletonCard() {
   return (
@@ -71,7 +54,8 @@ export default function PlacesSection({
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState(null);
   const [reloadToken, setReloadToken] = useState(0);
-  const [forceLive, setForceLive] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const forceRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,9 +68,11 @@ export default function PlacesSection({
     setSort("recommended");
     setVisible(PAGE_SIZE);
     setSelected(null);
+    setShowAll(false);
 
-    getPlaces(city, kind, { force: forceLive })
+    getPlaces(city, kind, { force: forceRef.current })
       .then((live) => {
+        forceRef.current = false;
         if (cancelled) return;
         const merged = mergePlaces(fallback, live, kind, city);
         setPlaces(merged);
@@ -94,6 +80,7 @@ export default function PlacesSection({
         setLiveStatus("live");
       })
       .catch(() => {
+        forceRef.current = false;
         if (cancelled) return;
         setLiveStatus("offline");
         setStatus(fallback.length ? "ready" : "error");
@@ -102,16 +89,12 @@ export default function PlacesSection({
     return () => {
       cancelled = true;
     };
-  }, [city, kind, reloadToken, forceLive]);
+  }, [city, kind, reloadToken]);
 
   const groupedPlaces = useMemo(() => {
-    if (isRestaurant || group === "all") return places;
-    return places.filter((place) =>
-      group === "landmarks"
-        ? LANDMARK_TYPES.has(place.typeLabel)
-        : !LANDMARK_TYPES.has(place.typeLabel)
-    );
-  }, [places, isRestaurant, group]);
+    if (isRestaurant || group === "all" || showAll) return places;
+    return places.filter((place) => place.activityGroup === group);
+  }, [places, isRestaurant, group, showAll]);
 
   const filtered = useMemo(() => {
     let list = groupedPlaces;
@@ -144,7 +127,7 @@ export default function PlacesSection({
   };
 
   const retryLive = () => {
-    setForceLive(true);
+    forceRef.current = true;
     setReloadToken((token) => token + 1);
   };
 
@@ -322,16 +305,25 @@ export default function PlacesSection({
             {t("places.emptyTitle", { noun: nounPlural, city: city.name })}
           </h2>
           <p className="mt-2 text-sm text-ink/55">{t("places.emptyBody")}</p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            {group === "landmarks" || group === "experiences" ? (
-              <a
-                href={group === "landmarks" ? "#activities" : "#attractions"}
-                className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-              >
-                {t(group === "landmarks" ? "city.activities" : "city.attractions")}
-              </a>
-            ) : null}
-            <button
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+              {places.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setShowAll(true)}
+                  className="inline-flex rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-6 py-2.5 text-sm font-semibold text-[#3d270e] shadow transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+                >
+                  {t("places.showAll")}
+                </button>
+              ) : null}
+              {group === "landmarks" || group === "experiences" ? (
+                <a
+                  href={group === "landmarks" ? "#activities" : "#attractions"}
+                  className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+                >
+                  {t(group === "landmarks" ? "city.activities" : "city.attractions")}
+                </a>
+              ) : null}
+              <button
               type="button"
               onClick={retryLive}
               className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"

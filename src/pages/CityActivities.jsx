@@ -4,6 +4,7 @@ import { cities } from "../data/cities";
 import { getCityName } from "../data/cityNames";
 import PlacesSection from "../components/places/PlacesSection";
 import SiteNav from "../components/SiteNav";
+import ZelligeEdges from "../components/ZelligeEdges";
 import { useI18n } from "../i18n/LanguageContext";
 
 export default function CityActivities() {
@@ -22,6 +23,8 @@ export default function CityActivities() {
 
   return (
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
+      <ZelligeEdges />
+
       <SiteNav
         backTo={`/cities/${slug}`}
         backLabel={t("city.backToCity", { city: cityName })}
@@ -30,7 +33,7 @@ export default function CityActivities() {
         onCategoryChange={(id) => navigate(`/cities/${slug}/${id}`)}
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-8 sm:px-6 sm:pt-10 lg:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-20 sm:px-6 sm:pt-24 lg:px-10">
         <section id="activities" className="scroll-mt-44">
           <PlacesSection
             city={city}
