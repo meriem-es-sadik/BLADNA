@@ -4,12 +4,23 @@ import ZelligeEdges from "../components/ZelligeEdges";
 import ZelligeOrnament from "../components/ZelligeOrnament";
 import { useI18n } from "../i18n/LanguageContext";
 
-const SECTIONS = [
-  { key: "why", image: "/img/cities/marrakech.png", alt: "Marrakech" },
-  { key: "story", image: "/img/cities/fes.png", alt: "Fes" },
-  { key: "different", image: "/img/cities/chefchaouen.png", alt: "Chefchaouen" },
-  { key: "mission", image: "/img/cities/essaouira.png", alt: "Essaouira" },
+const ABOUT_HERO_IMAGE = "/img/Marrakech%20Sunset%20with%20Atlas%20Mountains.png";
+
+const ABOUT_WHY_IMAGES = [
+  {
+    src: "/img/rabat-morocco.jpg",
+    altKey: "about.why.imageAltRabat",
+  },
+  {
+    src: "/img/Chefchaouen,Morroco.jpg",
+    altKey: "about.why.imageAltChefchaouen",
+  },
 ];
+
+const ABOUT_STORY_IMAGE = {
+  src: "/img/%E2%99%A5%EF%B8%8F%D8%A7%D9%84%D8%AF%D8%A7%D8%B1%20%D8%A7%D9%84%D8%A8%D9%8A%D8%B6%D8%A7%D8%A1%20%20%D8%B9%D8%A7%D8%B5%D9%85%D8%A9%20%D8%A7%D9%84%D8%A7%D9%82%D8%AA%D8%B5%D8%A7%D8%AF%D9%8A%D8%A9.jpg",
+  altKey: "about.story.imageAltCasablanca",
+};
 
 export default function About() {
   const { t } = useI18n();
@@ -32,16 +43,15 @@ export default function About() {
       <SiteNav transparent hideSearch />
 
       <main className="relative z-10 flex-1">
-        <section className="relative isolate flex min-h-[70vh] w-full items-end overflow-hidden bg-[#1b1208] sm:min-h-[78vh]">
-          <img
-            src="/img/cities/home3.png"
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-          />
+        <section
+          className="relative isolate flex min-h-[70vh] w-full items-end overflow-hidden bg-[#1b1208] sm:min-h-[78vh]"
+          style={{
+            backgroundImage: `url("${ABOUT_HERO_IMAGE}")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
           <div className="absolute inset-0 bg-linear-to-t from-[#120b04]/92 via-[#120b04]/45 to-[#120b04]/20" />
           <div className="absolute inset-0 bg-linear-to-r from-[#120b04]/40 via-transparent to-transparent rtl:bg-linear-to-l" />
           <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-32 sm:px-6 sm:pb-20 sm:pt-36 lg:px-10">
@@ -62,13 +72,22 @@ export default function About() {
           <div className="mx-auto grid w-full max-w-7xl gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div className="relative order-2 lg:order-1">
               <div className="absolute -inset-3 -z-10 rounded-[2rem] border border-gold/25 bg-[#f6ecd8]/50" aria-hidden="true" />
-              <img
-                src={SECTIONS[0].image}
-                alt={t("about.why.imageAlt")}
-                loading="lazy"
-                decoding="async"
-                className="h-[20rem] w-full rounded-[1.75rem] border border-gold/30 object-cover shadow-[0_30px_70px_-40px_rgba(63,42,18,0.55)] sm:h-[26rem]"
-              />
+              <div className="grid gap-3 sm:grid-cols-5">
+                <img
+                  src={ABOUT_WHY_IMAGES[0].src}
+                  alt={t(ABOUT_WHY_IMAGES[0].altKey)}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-64 w-full rounded-[1.75rem] border border-gold/30 object-cover shadow-[0_30px_70px_-40px_rgba(63,42,18,0.55)] sm:col-span-3 sm:h-[26rem]"
+                />
+                <img
+                  src={ABOUT_WHY_IMAGES[1].src}
+                  alt={t(ABOUT_WHY_IMAGES[1].altKey)}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-48 w-full rounded-[1.4rem] border border-gold/30 object-cover shadow-[0_30px_70px_-40px_rgba(63,42,18,0.55)] sm:col-span-2 sm:mt-16 sm:h-[20rem]"
+                />
+              </div>
             </div>
             <div className="order-1 lg:order-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gold-deep">
@@ -103,8 +122,8 @@ export default function About() {
             <div className="relative">
               <div className="absolute -inset-3 -z-10 rounded-[2rem] border border-gold/25 bg-white/40" aria-hidden="true" />
               <img
-                src={SECTIONS[1].image}
-                alt={t("about.story.imageAlt")}
+                src={ABOUT_STORY_IMAGE.src}
+                alt={t(ABOUT_STORY_IMAGE.altKey)}
                 loading="lazy"
                 decoding="async"
                 className="h-[20rem] w-full rounded-[1.75rem] border border-gold/30 object-cover shadow-[0_30px_70px_-40px_rgba(63,42,18,0.55)] sm:h-[26rem]"
