@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import SiteNav from "../components/SiteNav";
 import ZelligeEdges, { ZelligeDivider } from "../components/ZelligeEdges";
-import HotelsSection from "../components/hotels/HotelsSection";
-import PlacesSection from "../components/places/PlacesSection";
 import SectionIntro from "../components/SectionIntro";
 import { cities, getCityRegion } from "../data/cities";
 import { getCityGuide } from "../data/cityGuides";
@@ -92,12 +90,12 @@ function CityHero({ city, guide, cityName, story, t }) {
               {t("city.exploreCta")}
               <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             </button>
-            <a
-              href="#hotels"
+            <Link
+              to={`/cities/${city.slug}/hotels`}
               className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               {t("nav.hotels")}
-            </a>
+            </Link>
           </div>
 
           {images.length > 1 ? (
@@ -137,7 +135,6 @@ export default function CityPage() {
   const { slug } = useParams();
   const { t, lang } = useI18n();
   const city = cities.find((candidate) => candidate.slug === slug);
-  const [activeCategory, setActiveCategory] = useState("hotels");
 
   if (!city) {
     return <Navigate to="/cities" replace />;
@@ -178,17 +175,6 @@ export default function CityPage() {
     return items.slice(0, 4);
   }, [culture, guide?.tagline, history, knownFor, monuments, regionLabel, story.tagline, t]);
 
-  const secondaryNav = [
-    { id: "hotels", label: t("nav.hotels"), icon: BedDouble, href: "#hotels", to: `/cities/${city.slug}/hotels` },
-    { id: "restaurants", label: t("nav.restaurants"), icon: Utensils, href: "#restaurants", to: `/cities/${city.slug}/restaurants` },
-    { id: "activities", label: t("nav.activities"), icon: Compass, href: "#activities", to: `/cities/${city.slug}/activities` },
-  ];
-
-  const scrollTo = (id) => {
-    setActiveCategory(id);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const mapHref =
     typeof city.lat === "number" && typeof city.lon === "number"
       ? `https://www.openstreetmap.org/?mlat=${city.lat}&mlon=${city.lon}#map=12/${city.lat}/${city.lon}`
@@ -198,7 +184,12 @@ export default function CityPage() {
     <div className="page-anim relative flex min-h-dvh flex-col overflow-clip bg-ivory font-sans text-ink antialiased">
       <ZelligeEdges />
 
-      <SiteNav transparent hideSearch backTo="/cities" backLabel={t("city.backToCities")} />
+      <SiteNav
+        transparent
+        hideSearch
+        backTo="/destinations"
+        backLabel={t("city.backToDestinations")}
+      />
 
       <main className="relative z-10 flex-1">
         <CityHero city={city} guide={guide} cityName={cityName} story={story} t={t} />
@@ -300,126 +291,66 @@ export default function CityPage() {
           </section>
         ) : null}
 
-        <nav
-          aria-label={t("city.categoriesAria")}
-          className="sticky top-[4.25rem] z-30 mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-10"
-        >
-          <div className="flex flex-wrap items-center justify-center gap-2 rounded-[1.4rem] border border-gold/35 bg-ivory/95 p-2 shadow-[0_18px_40px_-24px_rgba(63,42,18,0.45)] ring-1 ring-gold/10 backdrop-blur-md">
-            {secondaryNav.map((item) => {
-              const Icon = item.icon;
-              const active = activeCategory === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => scrollTo(item.id)}
-                  aria-pressed={active}
-                  className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition ${
-                    active
-                      ? "bg-[#c9a24b]/18 text-gold-deep shadow-[inset_0_0_0_1px_rgba(201,162,75,0.7)]"
-                      : "text-ink/60 hover:bg-white hover:text-ink"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-        </nav>
-
         <ZelligeDivider />
 
-
-        <section id="attractions" className="scroll-mt-36 bg-[#f6ecd8]/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
+        <section id="explore" className="scroll-mt-36 bg-white/35 px-4 py-14 sm:px-6 lg:px-10">
           <div className="mx-auto w-full max-w-7xl">
             <SectionIntro
-              kicker={t("city.attractionsKicker")}
-              title={t("city.topAttractions", { city: cityName })}
-              intro={t("city.attractionsIntro")}
+              kicker={t("city.exploreMoreKicker")}
+              title={t("city.exploreMoreTitle", { city: cityName })}
+              intro={t("city.exploreMoreIntro")}
               align="center"
             />
-            <PlacesSection
-              city={city}
-              kind="activity"
-              group="landmarks"
-              showHeader={false}
-            />
-          </div>
-        </section>
-
-        <section id="hotels" className="scroll-mt-36 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
-          <div className="mx-auto w-full max-w-7xl">
-            <SectionIntro
-              kicker={t("city.hotelsKicker")}
-              title={t("city.hotelsTitle", { city: cityName })}
-              intro={t("city.hotelsIntro")}
-              align="center"
-            />
-            <HotelsSection city={city} showHeader={false} />
-            <div className="mt-8 flex justify-center">
-              <Link
-                to={`/cities/${city.slug}/hotels`}
-                className="inline-flex items-center gap-2 rounded-full border border-gold/45 bg-white/70 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-              >
-                {t("city.exploreHotels")}
-                <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <ZelligeDivider />
-
-        <section id="restaurants" className="scroll-mt-36 bg-white/35 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
-          <div className="mx-auto w-full max-w-7xl">
-            <SectionIntro
-              kicker={t("city.restaurantsKicker")}
-              title={t("city.restaurantsTitle", { city: cityName })}
-              intro={t("city.restaurantsIntro")}
-              align="center"
-            />
-            <PlacesSection
-              city={city}
-              kind="restaurant"
-              showHeader={false}
-            />
-            <div className="mt-8 flex justify-center">
-              <Link
-                to={`/cities/${city.slug}/restaurants`}
-                className="inline-flex items-center gap-2 rounded-full border border-gold/45 bg-white/70 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-              >
-                {t("city.exploreRestaurants")}
-                <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <ZelligeDivider />
-
-        <section id="activities" className="scroll-mt-36 px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
-          <div className="mx-auto w-full max-w-7xl">
-            <SectionIntro
-              kicker={t("city.activitiesKicker")}
-              title={t("city.activitiesTitle", { city: cityName })}
-              intro={t("city.activitiesIntro")}
-              align="center"
-            />
-            <PlacesSection
-              city={city}
-              kind="activity"
-              group="experiences"
-              showHeader={false}
-            />
-            <div className="mt-8 flex justify-center">
-              <Link
-                to={`/cities/${city.slug}/activities`}
-                className="inline-flex items-center gap-2 rounded-full border border-gold/45 bg-white/70 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-              >
-                {t("city.exploreActivities")}
-                <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
-              </Link>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  id: "hotels",
+                  icon: BedDouble,
+                  title: t("city.hotelsTitle", { city: cityName }),
+                  blurb: t("city.hotelsIntro"),
+                  cta: t("city.exploreHotels"),
+                },
+                {
+                  id: "restaurants",
+                  icon: Utensils,
+                  title: t("city.restaurantsTitle", { city: cityName }),
+                  blurb: t("city.restaurantsIntro"),
+                  cta: t("city.exploreRestaurants"),
+                },
+                {
+                  id: "activities",
+                  icon: Compass,
+                  title: t("city.activitiesTitle", { city: cityName }),
+                  blurb: t("city.activitiesIntro"),
+                  cta: t("city.exploreActivities"),
+                },
+                {
+                  id: "attractions",
+                  icon: Landmark,
+                  title: t("city.topAttractions", { city: cityName }),
+                  blurb: t("city.attractionsIntro"),
+                  cta: t("city.exploreAttractions"),
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    to={`/cities/${city.slug}/${item.id}`}
+                    className="group flex h-full flex-col rounded-[1.35rem] border border-gold/30 bg-white/75 p-5 shadow-[0_16px_40px_-30px_rgba(63,42,18,0.45)] transition hover:-translate-y-0.5 hover:border-gold/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+                  >
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#f6ecd8] text-gold-deep">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-4 font-display text-lg font-semibold text-ink">{item.title}</h3>
+                    <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-ink/65">{item.blurb}</p>
+                    <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-xs font-semibold text-gold-deep">
+                      {item.cta}
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" aria-hidden="true" />
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

@@ -148,7 +148,7 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
   if (!list.length) {
     return (
       <div className="relative overflow-hidden bg-[#efe3c8]">
-        <div className="aspect-[16/9] w-full sm:aspect-[21/9]">
+        <div className="aspect-[16/10] w-full sm:aspect-[2/1]">
           <img
             src={fallbackSrc}
             alt={t("gallery.illustrativeAlt", { kind })}
@@ -201,7 +201,7 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
         onTouchEnd={onTouchEnd}
       >
         {showingFallback ? (
-          <div className="aspect-[16/9] w-full sm:aspect-[21/9]">{mainImage}</div>
+          <div className="aspect-[16/10] w-full sm:aspect-[2/1]">{mainImage}</div>
         ) : (
           <button
             type="button"
@@ -266,7 +266,7 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
       </div>
 
       {hasMultiple && (
-        <div className="flex gap-2 overflow-x-auto border-t border-gold/20 bg-[#f6ecd8]/60 p-3">
+        <div className="flex gap-2 overflow-x-auto border-t border-gold/20 bg-[#f6ecd8]/60 p-2">
           {list.map((image, index) => (
             <button
               key={image.url}
@@ -275,7 +275,7 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
               aria-label={t("gallery.showPhoto", { index: index + 1 })}
               aria-current={index === active}
               className={
-                "h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
+                "h-11 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep " +
                 (index === active
                   ? "border-gold-deep"
                   : "border-transparent opacity-70 hover:opacity-100")
@@ -294,7 +294,7 @@ export default function HotelGallery({ images, name, kind = "hotel", city }) {
       )}
 
       {list.some((image) => image.source === "google") && (
-        <p className="border-b border-gold/20 bg-[#f6ecd8]/60 px-4 py-2 text-[10px] leading-relaxed text-ink/55 sm:px-6">
+        <p className="border-b border-gold/20 bg-[#f6ecd8]/60 px-3 py-1.5 text-[10px] leading-relaxed text-ink/55 sm:px-4">
           <a
             href="https://www.google.com/maps"
             target="_blank"

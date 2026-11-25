@@ -2,6 +2,7 @@ import { activitiesFallbackByCity } from "../data/activitiesFallback";
 import { restaurantsFallbackByCity } from "../data/restaurantsFallback";
 import { imagesFromTags, normalizeImage } from "./hotelsService";
 import { normalizeDataProvenance } from "../utils/dataProvenance";
+import { buildOsmLocationUrl, resolveReservationUrl } from "../utils/links";
 
 const CACHE_MS = 5 * 60 * 1000;
 const cache = new Map();
@@ -182,6 +183,21 @@ export function activityGroup(record) {
   return LANDMARK_LABELS.has(activityLabel(record)) ? "landmarks" : "experiences";
 }
 
+const NON_SIGHTSEEING_LABELS = new Set([
+  "Horse riding",
+  "Marina",
+  "Orchard",
+  "Studio",
+  "Town",
+  "Village",
+]);
+
+export function isAttractionPlace(place) {
+  if (!place || place.kind === "restaurant") return false;
+  if (NON_SIGHTSEEING_LABELS.has(place.typeLabel)) return false;
+  return place.activityGroup === "landmarks" || place.activityGroup === "experiences";
+}
+
 export function normalizeText(value) {
   return String(value || "")
     .normalize("NFD")
@@ -215,9 +231,6 @@ function normalizeWebsite(value) {
   return `https://${website}`;
 }
 
-function mapUrl(lat, lon) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lon}`)}`;
-}
 
 export function formatPlace(record, kind, city) {
   const typeLabel = kind === "restaurant" ? cuisineLabel(record.cuisine) : activityLabel(record);
@@ -270,6 +283,7 @@ export function formatPlace(record, kind, city) {
     cuisine: record.cuisine || null,
     openingHours: record.openingHours || null,
     website: normalizeWebsite(record.website),
+    reservationUrl: resolveReservationUrl(record),
     phone: record.phone || null,
     image: first?.url || null,
     images,
@@ -279,7 +293,7 @@ export function formatPlace(record, kind, city) {
     imageSourceUrl: first?.sourceUrl || null,
     wikimediaCommons: record.wikimediaCommons || null,
     wikidata: record.wikidata || null,
-    mapUrl: mapUrl(record.lat, record.lon),
+    mapUrl: buildOsmLocationUrl({ lat: record.lat, lon: record.lon }),
     sourceUrl: record.sourceUrl || null,
     sourceLabel: kind === "restaurant" ? "OpenStreetMap restaurant record" : "OpenStreetMap place record",
     searchText: normalizeText(
@@ -411,6 +425,9 @@ function elementToRecord(element, kind) {
     cuisine: tags.cuisine || null,
     openingHours: tags.opening_hours || null,
     website: normalizeWebsite(tags.website || tags["contact:website"]),
+    bookingUrl: tags.booking_url || tags["booking:url"] || tags.reservation_url || null,
+    reservationUrl:
+      tags.ticket_url || tags.tickets_url || tags["reservation:url"] || tags.tickets || null,
     phone: tags.phone || tags["contact:phone"] || null,
     historic: tags.historic || null,
     tourism: tags.tourism || null,

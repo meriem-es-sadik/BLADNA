@@ -1,6 +1,6 @@
 import { hotelsFallbackByCity } from "../data/hotelsFallback";
 import { normalizeDataProvenance } from "../utils/dataProvenance";
-import { safeBookingUrl } from "../utils/links";
+import { resolveReservationUrl, safeBookingUrl } from "../utils/links";
 
 const CACHE_VERSION = "v5";
 const CACHE_TTL = 24 * 60 * 60 * 1000;
@@ -321,6 +321,7 @@ function finalizeHotel(data, city) {
     area,
     address,
     bookingUrl: safeBookingUrl(data.bookingUrl) || null,
+    reservationUrl: resolveReservationUrl(data),
     amenities,
     images,
     image: first?.url || null,
@@ -360,6 +361,10 @@ function toHotel(element, city) {
       area,
       addrCity: tags["addr:city"] || "",
       website: safeHttpUrl(tags.website || tags["contact:website"]),
+      bookingUrl: safeHttpUrl(
+        tags.booking_url || tags["booking:url"] || tags.reservation_url || tags["reservation:url"]
+      ),
+      reservationUrl: safeHttpUrl(tags.ticket_url || tags.tickets),
       phone: (tags.phone || tags["contact:phone"] || "").trim() || null,
       images: imagesFromTags(tags),
       wikidata: tags.wikidata || null,
@@ -395,9 +400,10 @@ export function getFallbackHotels(city) {
         address: record.address || null,
         area: record.area || null,
         addrCity: city.name,
-        website: safeHttpUrl(record.website),
-        bookingUrl: record.bookingUrl || null,
-        phone: record.phone || null,
+          website: safeHttpUrl(record.website),
+          bookingUrl: safeBookingUrl(record.bookingUrl),
+          reservationUrl: safeHttpUrl(record.reservationUrl || record.ticketUrl),
+          phone: record.phone || null,
         images: record.images || [],
         image: record.image || null,
         imageCredit: record.imageCredit || null,
@@ -457,6 +463,7 @@ export function mergeHotels(fallback, live, city) {
           rating: hotel.rating ?? base.rating,
           website: hotel.website || base.website,
           bookingUrl: hotel.bookingUrl || base.bookingUrl,
+          reservationUrl: hotel.reservationUrl || base.reservationUrl,
           phone: hotel.phone || base.phone,
           images: [...(hotel.images || []), ...(base.images || [])],
           wikidata: hotel.wikidata || base.wikidata,

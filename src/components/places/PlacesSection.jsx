@@ -1,24 +1,26 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { RotateCcw, Search } from "lucide-react";
 import PlaceCard from "./PlaceCard";
-import PlaceDetails from "./PlaceDetails";
 import SectionIntro from "../SectionIntro";
 import {
   getFallbackPlaces,
   getPlaces,
+  isAttractionPlace,
   mergePlaces,
   normalizeText,
   sortPlaces,
 } from "../../services/placesService";
 import { useI18n } from "../../i18n/LanguageContext";
+import { buildItemPath, detailCategoryForGroup } from "../../utils/itemRoutes";
 
 const PAGE_SIZE = 9;
 
 function SkeletonCard() {
   return (
     <div className="animate-pulse overflow-hidden rounded-[1.25rem] border border-gold/25 bg-white/50">
-      <div className="aspect-[16/10] w-full bg-ink/10" />
-      <div className="space-y-3 p-5">
+      <div className="aspect-[16/9] w-full bg-ink/10" />
+      <div className="space-y-2 p-4">
         <div className="h-4 w-2/3 rounded-full bg-ink/10" />
         <div className="h-3 w-1/3 rounded-full bg-ink/10" />
         <div className="h-3 w-full rounded-full bg-ink/10" />
@@ -39,10 +41,10 @@ export default function PlacesSection({
 }) {
   const { t } = useI18n();
   const isRestaurant = kind === "restaurant";
-  const isLandmarks = group === "landmarks";
+  const isAttractions = group === "attractions" || group === "landmarks";
   const nounPlural = isRestaurant
     ? t("places.nounRestaurants")
-    : isLandmarks
+    : isAttractions
       ? t("places.nounAttractions")
       : t("places.nounActivities");
   const [places, setPlaces] = useState(() => getFallbackPlaces(city, kind));
@@ -52,9 +54,7 @@ export default function PlacesSection({
   const [type, setType] = useState(null);
   const [sort, setSort] = useState("recommended");
   const [visible, setVisible] = useState(PAGE_SIZE);
-  const [selected, setSelected] = useState(null);
   const [reloadToken, setReloadToken] = useState(0);
-  const [showAll, setShowAll] = useState(false);
   const forceRef = useRef(false);
 
   useEffect(() => {
@@ -67,8 +67,6 @@ export default function PlacesSection({
     setType(null);
     setSort("recommended");
     setVisible(PAGE_SIZE);
-    setSelected(null);
-    setShowAll(false);
 
     getPlaces(city, kind, { force: forceRef.current })
       .then((live) => {
@@ -92,9 +90,10 @@ export default function PlacesSection({
   }, [city, kind, reloadToken]);
 
   const groupedPlaces = useMemo(() => {
-    if (isRestaurant || group === "all" || showAll) return places;
+    if (isRestaurant || group === "all") return places;
+    if (group === "attractions") return places.filter(isAttractionPlace);
     return places.filter((place) => place.activityGroup === group);
-  }, [places, isRestaurant, group, showAll]);
+  }, [places, isRestaurant, group]);
 
   const filtered = useMemo(() => {
     let list = groupedPlaces;
@@ -158,7 +157,7 @@ export default function PlacesSection({
         <div className="mb-6 flex justify-center">
           <div className="h-10 w-64 animate-pulse rounded-full border border-gold/25 bg-white/50" />
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 6 }, (_, index) => (
             <SkeletonCard key={index} />
           ))}
@@ -188,10 +187,6 @@ export default function PlacesSection({
         </div>
       </div>
     );
-  }
-
-  if (selected) {
-    return <PlaceDetails place={selected} onClose={() => setSelected(null)} />;
   }
 
   return (
@@ -305,25 +300,16 @@ export default function PlacesSection({
             {t("places.emptyTitle", { noun: nounPlural, city: city.name })}
           </h2>
           <p className="mt-2 text-sm text-ink/55">{t("places.emptyBody")}</p>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-              {places.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={() => setShowAll(true)}
-                  className="inline-flex rounded-full bg-linear-to-r from-[#d9b466] via-[#c9a24b] to-[#b3863d] px-6 py-2.5 text-sm font-semibold text-[#3d270e] shadow transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-                >
-                  {t("places.showAll")}
-                </button>
-              ) : null}
-              {group === "landmarks" || group === "experiences" ? (
-                <a
-                  href={group === "landmarks" ? "#activities" : "#attractions"}
-                  className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-                >
-                  {t(group === "landmarks" ? "city.activities" : "city.attractions")}
-                </a>
-              ) : null}
-              <button
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            {!isRestaurant && (isAttractions || group === "experiences") ? (
+              <Link
+                to={`/cities/${city.slug}/${isAttractions ? "activities" : "attractions"}`}
+                className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+              >
+                {t(isAttractions ? "nav.activities" : "nav.attractions")}
+              </Link>
+            ) : null}
+            <button
               type="button"
               onClick={retryLive}
               className="inline-flex rounded-full border border-gold/50 px-6 py-2.5 text-sm font-semibold text-gold-deep transition hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
@@ -348,9 +334,17 @@ export default function PlacesSection({
         </div>
       ) : (
         <>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.slice(0, visible).map((place) => (
-              <PlaceCard key={place.id} place={place} onDetails={setSelected} />
+              <PlaceCard
+                key={place.id}
+                place={place}
+                href={buildItemPath(
+                  place.citySlug || city.slug,
+                  detailCategoryForGroup(group, place),
+                  place.id
+                )}
+              />
             ))}
           </div>
 

@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { Search, X, ArrowUpRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, ArrowUpRight, Search, X } from "lucide-react";
 import { useState } from "react";
 import SiteNav from "../components/SiteNav";
 import { cities } from "../data/cities";
@@ -61,6 +61,13 @@ export default function Cities() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 pb-6 pt-20 sm:px-6 sm:pt-24 lg:px-10">
         <section className="flex shrink-0 flex-col items-center text-center">
+          <Link
+            to="/destinations"
+            className="mb-4 inline-flex items-center gap-2 self-start text-sm font-medium text-ink/75 transition-colors hover:text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
+          >
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+            {t("city.backToDestinations")}
+          </Link>
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
             {t("cities.titleA")} <span className="italic text-terra">{t("cities.titleB")}</span>
           </h1>

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import HotelCard from "./HotelCard";
-import HotelDetails from "./HotelDetails";
 import HotelFilters from "./HotelFilters";
 import HotelSearch from "./HotelSearch";
 import SectionIntro from "../SectionIntro";
@@ -13,14 +12,15 @@ import {
 } from "../../services/hotelsService";
 import { fallbackAttribution } from "../../data/hotelsFallback";
 import { useI18n } from "../../i18n/LanguageContext";
+import { buildItemPath } from "../../utils/itemRoutes";
 
 const PAGE_SIZE = 12;
 
 function SkeletonCard() {
   return (
     <div className="animate-pulse overflow-hidden rounded-[1.25rem] border border-gold/25 bg-white/50">
-      <div className="aspect-[16/10] w-full bg-ink/10" />
-      <div className="space-y-3 p-5">
+      <div className="aspect-[16/9] w-full bg-ink/10" />
+      <div className="space-y-2 p-4">
         <div className="h-4 w-2/3 rounded-full bg-ink/10" />
         <div className="h-3 w-1/3 rounded-full bg-ink/10" />
         <div className="h-3 w-full rounded-full bg-ink/10" />
@@ -47,7 +47,6 @@ export default function HotelsSection({
   const [type, setType] = useState(null);
   const [sort, setSort] = useState("rating");
   const [visible, setVisible] = useState(PAGE_SIZE);
-  const [selected, setSelected] = useState(null);
   const [reloadToken, setReloadToken] = useState(0);
   const forceRefresh = useRef(false);
 
@@ -62,7 +61,6 @@ export default function HotelsSection({
     setType(null);
     setSort("rating");
     setVisible(PAGE_SIZE);
-    setSelected(null);
 
     getHotels(city, controller.signal, { force: forceRefresh.current })
       .then((list) => {
@@ -143,7 +141,7 @@ export default function HotelsSection({
         <div className="mb-6 flex justify-center">
           <div className="h-10 w-64 animate-pulse rounded-full border border-gold/25 bg-white/50" />
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 6 }, (_, i) => (
             <SkeletonCard key={i} />
           ))}
@@ -172,16 +170,6 @@ export default function HotelsSection({
           </button>
         </div>
       </div>
-    );
-  }
-
-  if (selected) {
-    return (
-      <HotelDetails
-        hotel={selected}
-        cityName={city.name}
-        onClose={() => setSelected(null)}
-      />
     );
   }
 
@@ -262,9 +250,14 @@ export default function HotelsSection({
         </div>
       ) : (
         <>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.slice(0, visible).map((h) => (
-              <HotelCard key={h.id} hotel={h} cityName={city.name} onDetails={setSelected} />
+              <HotelCard
+                key={h.id}
+                hotel={h}
+                cityName={city.name}
+                href={buildItemPath(city.slug, "hotels", h.id)}
+              />
             ))}
           </div>
 

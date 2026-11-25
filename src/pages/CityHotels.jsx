@@ -29,11 +29,9 @@ export default function CityHotels() {
         backTo={`/cities/${slug}`}
         backLabel={t("city.backToCity", { city: cityName })}
         hideSearch={true}
-        category="hotels"
-        onCategoryChange={(id) => navigate(`/cities/${slug}/${id}`)}
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-20 sm:px-6 sm:pt-24 lg:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-14 pt-6 sm:px-6 sm:pt-8 lg:px-10">
         <section id="hotels" className="scroll-mt-44">
           <HotelsSection
             city={city}

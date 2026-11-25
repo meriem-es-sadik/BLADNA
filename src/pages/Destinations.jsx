@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import BrandLogo from "../components/BrandLogo";
 import DestinationCard from "../components/DestinationCard";
+import SiteNav from "../components/SiteNav";
 import { destinations } from "../data/destinations";
 import { useI18n } from "../i18n/LanguageContext";
 import { goldCtaClass, goldCtaIconClass } from "../utils/ctaStyles";
@@ -54,17 +54,9 @@ export default function Destinations() {
         />
       </div>
 
-      <div className="page-fit-inner relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-4 sm:px-6 lg:px-10">
-        <header className="flex shrink-0 justify-center">
-          <Link
-            to="/"
-            aria-label={t("brand.home")}
-            className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-deep"
-          >
-            <BrandLogo />
-          </Link>
-        </header>
+      <SiteNav hideSearch />
 
+      <div className="page-fit-inner relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-20 sm:px-6 lg:px-10">
         <section className="flex shrink-0 flex-col items-center text-center">
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-medium leading-tight text-ink sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
             {t("destinations.titleA")}{" "}

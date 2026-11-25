@@ -13,6 +13,8 @@ const AboutPage = lazy(() => import("./pages/About"));
 const HotelsPage = lazy(() => import("./pages/CityHotels"));
 const RestaurantsPage = lazy(() => import("./pages/CityRestaurants"));
 const ActivitiesPage = lazy(() => import("./pages/CityActivities"));
+const AttractionsPage = lazy(() => import("./pages/CityAttractions"));
+const ItemDetailPage = lazy(() => import("./pages/ItemDetailPage"));
 
 function PageLoader() {
   const { t } = useI18n();
@@ -41,9 +43,15 @@ export default function App() {
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/cities" element={<Cities />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/cities/:city/hotels/:itemId" element={<ItemDetailPage category="hotels" />} />
+              <Route path="/cities/:city/restaurants/:itemId" element={<ItemDetailPage category="restaurants" />} />
+              <Route path="/cities/:city/activities/:itemId" element={<ItemDetailPage category="activities" />} />
+              <Route path="/cities/:city/attractions/:itemId" element={<ItemDetailPage category="attractions" />} />
+              <Route path="/cities/:city/places/:itemId" element={<ItemDetailPage category="places" />} />
               <Route path="/cities/:city/hotels" element={<HotelsPage />} />
               <Route path="/cities/:city/restaurants" element={<RestaurantsPage />} />
               <Route path="/cities/:city/activities" element={<ActivitiesPage />} />
+              <Route path="/cities/:city/attractions" element={<AttractionsPage />} />
               <Route path="/cities/:slug" element={<CityPage />} />
               <Route path="*" element={<Home />} />
             </Routes>

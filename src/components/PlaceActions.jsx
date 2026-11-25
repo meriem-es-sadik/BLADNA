@@ -1,32 +1,46 @@
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink, MapPin, Navigation } from "lucide-react";
 import { useI18n } from "../i18n/LanguageContext";
-import { buildMapUrl, safeBookingUrl, safeExternalUrl } from "../utils/links";
+import {
+  buildOsmDirectionsUrl,
+  buildOsmLocationUrl,
+  safeBookingUrl,
+  safeExternalUrl,
+  safeOsmEntityUrl,
+  safeReservationUrl,
+} from "../utils/links";
 
 export default function PlaceActions({
   website,
   bookingUrl,
+  reservationUrl,
   lat,
   lon,
   name,
   city,
   osmUrl,
+  reservationLabel = "detail.bookNow",
   variant = "details",
   className = "",
 }) {
   const { t } = useI18n();
   const site = safeExternalUrl(website);
-  const booking = safeBookingUrl(bookingUrl);
-  const mapUrl = buildMapUrl({ lat, lon, name, city });
+  const booking = safeBookingUrl(bookingUrl) || safeReservationUrl(reservationUrl);
+  const mapUrl = buildOsmLocationUrl({ lat, lon });
+  const directionsUrl = buildOsmDirectionsUrl({ lat, lon });
+  const sourceUrl = safeOsmEntityUrl(osmUrl);
   const isCard = variant === "card";
 
   const base = isCard
     ? "inline-flex items-center gap-1 rounded-full border border-gold/50 px-2.5 py-1 text-[11px] font-semibold text-gold-deep transition-all duration-300 hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
-    : "inline-flex items-center gap-2 rounded-full border border-gold/50 px-5 py-2.5 text-xs font-semibold text-gold-deep transition-all duration-300 hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep sm:text-sm";
+    : "inline-flex items-center gap-1.5 rounded-full border border-gold/50 px-3 py-1.5 text-[11px] font-semibold text-gold-deep transition-all duration-300 hover:bg-[#c9a24b] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep sm:text-xs";
 
-  const iconClass = isCard ? "h-3 w-3" : "h-3.5 w-3.5";
+  const iconClass = "h-3 w-3";
 
   return (
-    <div className={(isCard ? "mt-3 flex flex-wrap gap-1.5 " : "mt-5 flex flex-wrap gap-2.5 ") + className}>
+    <div
+      data-detail-actions
+      className={(isCard ? "mt-3 flex flex-wrap gap-1.5 " : "mt-3 flex flex-wrap gap-2 ") + className}
+    >
       {site ? (
         <a
           href={site}
@@ -41,6 +55,7 @@ export default function PlaceActions({
       ) : null}
       {booking ? (
         <a
+          data-booking-link
           href={booking}
           target="_blank"
           rel="noopener noreferrer"
@@ -48,11 +63,12 @@ export default function PlaceActions({
           className={base}
         >
           <ExternalLink className={iconClass} aria-hidden="true" />
-          {t("hotels.bookOnBooking")}
+          {t(reservationLabel)}
         </a>
       ) : null}
       {mapUrl ? (
         <a
+          data-map-link
           href={mapUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -63,9 +79,23 @@ export default function PlaceActions({
           {t("common.viewOnMap")}
         </a>
       ) : null}
-      {osmUrl && !isCard ? (
+      {directionsUrl && !isCard ? (
         <a
-          href={osmUrl}
+          data-direction-link
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          className={base}
+        >
+          <Navigation className={iconClass} aria-hidden="true" />
+          {t("detail.getDirections")}
+        </a>
+      ) : null}
+      {sourceUrl && !isCard ? (
+        <a
+          data-source-link
+          href={sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(event) => event.stopPropagation()}

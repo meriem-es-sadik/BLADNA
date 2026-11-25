@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, MapPin } from "lucide-react";
 import { getFallbackPhoto, getPrimaryPhoto } from "../../services/hotelPhotosService";
 import { useI18n } from "../../i18n/LanguageContext";
 import { getSourceLabelKey } from "../../utils/dataProvenance";
@@ -16,8 +17,9 @@ function photoFromPlace(place) {
   };
 }
 
-export default function PlaceCard({ place, onDetails }) {
+export default function PlaceCard({ place, href }) {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const sourceLabelKey = getSourceLabelKey(place);
   const [photo, setPhoto] = useState(() => photoFromPlace(place));
   const [loading, setLoading] = useState(!place.image);
@@ -47,7 +49,7 @@ export default function PlaceCard({ place, onDetails }) {
     return () => controller.abort();
   }, [place.id, place.image, place.wikimediaCommons, place.wikidata]);
 
-  const open = () => onDetails(place);
+  const open = () => navigate(href);
   const fallback = getFallbackPhoto(place);
   const src = photo?.url || fallback?.url;
   const isIllustrative = !photo || photo.isIllustrative;
@@ -58,10 +60,19 @@ export default function PlaceCard({ place, onDetails }) {
 
   return (
     <article
+      role="link"
+      tabIndex={0}
       onClick={open}
-      className="group flex cursor-pointer flex-col overflow-hidden rounded-[1.25rem] border border-gold/30 bg-[#fbf6ea] shadow-[0_12px_30px_-18px_rgba(63,42,18,0.4)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-gold/60 hover:shadow-[0_20px_40px_-18px_rgba(63,42,18,0.45)]"
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open();
+        }
+      }}
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-[1.25rem] border border-gold/30 bg-[#fbf6ea] shadow-[0_10px_26px_-18px_rgba(63,42,18,0.4)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-gold/60 hover:shadow-[0_18px_36px_-18px_rgba(63,42,18,0.45)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep"
     >
-      <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-[#efe3c8]">
+      <div className="relative flex aspect-[16/9] items-center justify-center overflow-hidden bg-[#efe3c8]">
         <img
           src={src}
           alt={
@@ -84,6 +95,10 @@ export default function PlaceCard({ place, onDetails }) {
           className="absolute inset-0 bg-linear-to-t from-[#1b140c]/45 via-transparent to-transparent"
           aria-hidden="true"
         />
+        <span className="pointer-events-none absolute inset-x-3 top-1/2 flex -translate-y-[35%] items-center justify-center gap-1.5 rounded-full border border-white/45 bg-[#1b140c]/70 px-3 py-1.5 text-[11px] font-semibold text-white opacity-0 backdrop-blur-sm transition duration-300 group-hover:-translate-y-1/2 group-hover:opacity-100 group-focus-visible:-translate-y-1/2 group-focus-visible:opacity-100">
+          {t("common.viewDetails")}
+          <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
+        </span>
 
         {loading && (
           <span
@@ -124,20 +139,32 @@ export default function PlaceCard({ place, onDetails }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-4 text-start sm:p-5">
-        <h3 className="font-display text-lg font-semibold leading-snug text-ink">{place.name}</h3>
-        <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-deep">
+      <div className="flex flex-1 flex-col p-4 text-start">
+        <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug text-ink sm:text-lg">
+          {place.name}
+        </h3>
+        <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-deep">
           {place.typeLabel}
         </p>
-        <p className="mt-2 text-sm leading-relaxed text-ink/70">{place.description}</p>
-        <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-ink/55">
-          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          <span className="line-clamp-2">{place.location}</span>
+        <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-ink/65">
+          {place.description}
+        </p>
+        <p className="mt-1.5 flex items-start gap-1.5 text-[11px] leading-relaxed text-ink/55">
+          <MapPin className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+          <span className="line-clamp-1">{place.location}</span>
         </p>
 
         <PlaceActions
           variant="card"
           website={place.website}
+          reservationUrl={place.reservationUrl}
+          reservationLabel={
+            place.kind === "restaurant"
+              ? "detail.reserveTable"
+              : place.activityGroup === "attractions"
+                ? "detail.bookTickets"
+                : "detail.bookNow"
+          }
           lat={place.lat}
           lon={place.lon}
           name={place.name}
